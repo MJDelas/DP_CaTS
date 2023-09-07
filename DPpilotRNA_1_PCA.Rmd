@@ -335,7 +335,7 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
 
 
 # Correlation Heatmaps - based on 500 top genes 
-```{r fig.width=11,fig.height=11, eval=FALSE}
+```{r fig.width=11,fig.height=11, eval=FALSE, include=FALSE}
 
 cor_vsd <-cor( vsd_data[select,] )
 
@@ -385,7 +385,7 @@ Heatmap(cor_vsd, name="Correlation", col=hm_colors,
 
 # Correlation Heatmaps - just genes
 
-```{r fig.width=11,fig.height=11, eval=FALSE}
+```{r fig.width=11,fig.height=11, eval=FALSE, include=FALSE}
 
 vsd_data_genes <- vsd_data %>% 
   as.data.frame() %>%
