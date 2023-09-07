@@ -126,7 +126,9 @@ Heatmap(cor_vsd, name="Correlation", col=hm_colors,
   transitioning from p0.
 
 ``` r
-geneOI <- c("Sox2","Dbx1","Irx3","Pax6","Nkx6-1","Olig2","Nkx2-2","Foxa2","Shh","Arx","Tubb3","Sim1","Mnx1")
+geneOI <- c("Sox2","Dbx1","Irx3","Pax6","Nkx6-1","Olig2","Nkx2-2","Foxa2",
+            "Shh","Arx",
+            "Tubb3","Sim1","Mnx1","Isl1","Isl2")
 
 
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(geneid, levels=geneOI)), 
