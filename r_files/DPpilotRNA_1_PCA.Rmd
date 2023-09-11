@@ -446,8 +446,8 @@ Heatmap(cor_vsd, name="Correlation", col=hm_colors,
 dds_counts <- counts(dds, normalized = TRUE)
 vsd_data <- assay(vsd)
 
-write.table(dds_counts, file = paste0(workingdir,outdir,"featurecounts.normCounts.txt"), quote = FALSE, row.names = TRUE)
-write.csv(vsd_data, file = paste0(workingdir,outdir,"featurecounts.vsd.csv"), quote = FALSE)
+# write.table(dds_counts, file = paste0(workingdir,outdir,"featurecounts.normCounts.txt"), quote = FALSE, row.names = TRUE)
+# write.csv(vsd_data, file = paste0(workingdir,outdir,"featurecounts.vsd.csv"), quote = FALSE)
 
 ```
 
