@@ -21,11 +21,11 @@ library(tximport)
 workingdir="~/Dropbox (The Francis Crick)/DP_cisReg/"
 subworkinput="inputs_RNApilot/"
 
-outdir="outputs_glialRNA_1/"
+outdir="outputs_RNApilot_1/"
 ifelse(!dir.exists(file.path(workingdir,outdir)), dir.create(file.path(workingdir,outdir)), "Directory exists")
 ```
 
-    ## [1] "Directory exists"
+    ## [1] TRUE
 
 ## Load data
 
@@ -120,18 +120,16 @@ sorted_conditions <- c("500","UPSAG","dRA2UPSAG","dRA")
 shapes4_manual = c(18,15,16,17) # these are block
 shapes5_manual = c(25,21,22,23,24) # these are filled
 shapes4_fill_manual = c(23,21,22,24)
-# 
-# # for Days
-# red_colors <- c("#fadede","#f3aaaa","#e96666","#cf1e1e")
+ 
 
-
-color_gates <- c("#b30000","#800080","#009640","#696969")
+color_gates <- c("#e60000","#cd00cd","#0073e6","#696969")
 
 # for Days
 colors_greys <- c("#f6f6f6","#808080","#333333")
 
 # conditions
-colors_conditions <- c("#b81bb8","#b81b1b","#1bb81b","#1bb8b8")
+
+colors_conditions <- c("#e67300","#4d9a00","#cdcd00","#0073e6")
 ```
 
 ## Differential analysis

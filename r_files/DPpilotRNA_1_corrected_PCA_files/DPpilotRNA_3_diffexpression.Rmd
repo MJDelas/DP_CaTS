@@ -1,0 +1,268 @@
+---
+title: "RNA_3_diffexpression"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = TRUE)
+
+```
+
+# RNA analysis
+Differential expression between gates, conditions and timepoints
+
+```{r message=FALSE}
+
+rm(list=ls())
+
+library(DESeq2)
+library(RColorBrewer)
+library(tidyverse)
+library(ComplexHeatmap)
+library(tximport)
+
+```
+
+
+### Set dirs
+```{r}
+
+workingdir="~/Dropbox (The Francis Crick)/DP_cisReg/"
+subworkinput="inputs_RNApilot/"
+outdir="outputs_RNApilot_3_diffexpression/"
+
+ifelse(!dir.exists(file.path(workingdir,outdir)), dir.create(file.path(workingdir,outdir)), "Directory exists")
+
+# suboutdir1="output_Domain_Specific/"
+# ifelse(!dir.exists(file.path(workingdir,outdir,suboutdir1)), dir.create(file.path(workingdir,outdir,suboutdir1)), "Directory exists")
+# suboutdir2="output_Time_Specific/"
+# ifelse(!dir.exists(file.path(workingdir,outdir,suboutdir2)), dir.create(file.path(workingdir,outdir,suboutdir2)), "Directory exists")
+# 
+
+```
+
+
+
+## Load data
+
+For RNA analysis, we are using the output of star_salmon so the import to deseq is a bit more complicated.
+
+```{r }
+
+#salmon counts from pipeline, import
+path_files =  list.files(paste0(workingdir,subworkinput)) 
+samples = data.frame(run=path_files, stringsAsFactors = FALSE) %>%
+  filter(str_detect(run, "^D"))
+
+files <- file.path(paste0(workingdir,subworkinput), samples$run, "quant.sf")
+names(files) <- samples$run
+all(file.exists(files))
+
+#from pipeline
+tx2gene = read_tsv(paste0(paste0(workingdir,subworkinput),"/salmon_tx2gene.tsv"))
+
+txi.salmon <- tximport(files, type = "salmon", tx2gene = tx2gene)
+
+
+```
+
+
+
+## Colors and shapes
+
+```{r }
+sorted_gate <- c("pMN","DP","p3","neur")
+sorted_conditions <- c("500","UPSAG","dRA2UPSAG","dRA")
+
+
+shapes4_manual = c(18,15,16,17) # these are block
+shapes5_manual = c(25,21,22,23,24) # these are filled
+shapes4_fill_manual = c(23,21,22,24)
+ 
+
+color_gates <- c("#e60000","#cd00cd","#0073e6","#696969")
+
+# for Days
+colors_greys <- c("#f6f6f6","#808080","#333333")
+
+# conditions
+
+colors_conditions <- c("#e67300","#4d9a00","#cdcd00","#0073e6")
+```
+
+## Differential analysis between domains for a given timepoint and condition
+
+Targeted diff analysis in subsets of samples:
+
+- make a extra lapply to go through conditions
+
+This DESeq2 analysis is done by subsetting samples. I subset the `txi.salmon$counts` table and then use ` DESeqDataSetFromMatrix` with `round(sub_counts)` to perform the differential analysis. 
+
+```{r}
+
+count_matrix <- txi.salmon$counts %>%
+  as.data.frame()
+
+
+#subset 
+timepoint=c("D5_","D6_","D7_")
+#matrix
+allgates=matrix(c("_pMN_","_p3_","_pMN_","_DP_","_p3_","_DP_"),
+                 nrow=2,
+                 ncol=3)
+geno="_500_"
+
+comparisons <- allgates
+
+# count_matrix <- count_table %>%
+#   column_to_rownames("Geneid")
+
+
+x=2
+y=2
+
+## many comparisons do not have 2 reps and 2 conditions
+
+PairWiseDEseq <- lapply(c(1:length(timepoint)),function (x) {
+  lapply(c(1:ncol(allgates)), function (y) {
+      timepoints <- timepoint[x]
+      celltypes <- allgates[,y]
+      sub_counts <- count_matrix %>%
+        dplyr::select(contains(geno)  & contains(celltypes) & contains(timepoints))
+      
+      ## Make metadata file for DESeq
+      genecolData_sub <- data.frame(Sample = colnames(sub_counts))
+      genecolData_sub <- genecolData_sub %>% 
+        separate(Sample,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) %>%
+        mutate(DayGate=factor(paste(Day,Gate,sep="_")),
+              DayCondition=paste(Day,Condition),
+              Experiment=paste(Condition,Rep,sep="_"),
+              Gate=factor(Gate, levels=sorted_gate))
+      genecolData_sub <- as.data.frame(unclass(genecolData_sub))
+      
+      
+      dds_sub <- DESeqDataSetFromMatrix(countData =  round(sub_counts),
+                              colData = genecolData_sub,
+                              design = ~ Gate)
+          
+      dds_sub <- DESeq(dds_sub)
+      
+      vsd_sub <- varianceStabilizingTransformation(dds_sub,blind = FALSE)
+      
+      # Export normalized tables for plotting elsewhere
+      dds_sub_counts <- counts(dds_sub, normalized = TRUE)
+      vsd_sub_data <- assay(vsd_sub)
+      
+      results_sub <- results(dds_sub)
+
+      # plotMA(results_sub,ylim=c(-8,8))
+
+      ## Export files
+      
+      write.table(dds_sub_counts,
+      file = paste0(workingdir,outdir,suboutdir1,"CountsNormalized_",timepoints,celltypes[1],celltypes[2],".txt"),
+          quote = FALSE, row.names = TRUE)
+      write.csv(vsd_sub_data,
+          paste0(workingdir,outdir,suboutdir1,"VSData_",timepoints,celltypes[1],celltypes[2],".csv"),
+          quote = FALSE)
+      write.table(results_sub,
+          file = paste0(workingdir,outdir,suboutdir1,"Results_DESeq_",timepoints,celltypes[1],celltypes[2],".txt"),
+          quote = FALSE, row.names = TRUE)
+
+      results_return <- results_sub %>% as.data.frame() %>% rownames_to_column("Geneid")
+      results_return$Comparison <- paste0("Comp_",timepoints,celltypes[1],celltypes[2])
+      results_return
+
+  })
+}) 
+
+
+```
+
+## Differential analysis between timepoints for each domain and condition 
+
+For each gate:
+- differential analysis between timepoints for the same condition: To do, extra lapply for conditions 
+
+and finally later 
+
+- differential analysis between conditions for the same timepoint
+
+```{r}
+
+#subset 
+allgates=c("_pMN_","_p3_","_DP_")
+#matrix
+timepoints=matrix(c("D5_","D6_","D5_","D7_","D6_","D7_"),
+                 nrow=2,
+                 ncol=3)
+geno="_500_"
+
+comparisons <- timepoints
+
+x=2
+y=3
+
+PairWiseDEseq <- lapply(c(1:length(allgates)),function (x) {
+  lapply(c(1:ncol(timepoints)), function (y) {
+      celltypes <- allgates[x]
+      days <- timepoints[,y]
+      sub_counts <- count_matrix %>%
+        dplyr::select(contains(geno)  & contains(celltypes) & contains(days))
+      
+      ## Make metadata file for DESeq
+      genecolData_sub <- data.frame(Sample = colnames(sub_counts))
+      genecolData_sub <- genecolData_sub %>% 
+        separate(Sample,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) %>%
+        mutate(DayGate=factor(paste(Day,Gate,sep="_")),
+              DayCondition=paste(Day,Condition),
+              Experiment=paste(Condition,Rep,sep="_"),
+              Gate=factor(Gate, levels=sorted_gate))
+      genecolData_sub <- as.data.frame(unclass(genecolData_sub))
+         
+      dds_sub <- DESeqDataSetFromMatrix(countData = round(sub_counts),
+                                    colData = genecolData_sub,
+                                    design = ~ Day)
+      
+      dds_sub <- DESeq(dds_sub)
+      
+      vsd_sub <- varianceStabilizingTransformation(dds_sub,blind = FALSE)
+      
+      # Export normalized tables for plotting elsewhere
+      dds_sub_counts <- counts(dds_sub, normalized = TRUE)
+      vsd_sub_data <- assay(vsd_sub)
+      
+      results_sub <- results(dds_sub)
+
+      #plotMA(results_sub,ylim=c(-8,8))
+
+      ## Export files
+      
+      write.table(dds_sub_counts,
+      file = paste0(workingdir,outdir,suboutdir2,"CountsNormalized_",celltypes,days[1],days[2],".txt"),
+          quote = FALSE, row.names = TRUE)
+      write.csv(vsd_sub_data,
+          paste0(workingdir,outdir,suboutdir2,"VSData_",celltypes,days[1],days[2],".csv"),
+          quote = FALSE)
+      write.table(results_sub,
+          file = paste0(workingdir,outdir,suboutdir2,"Results_DESeq_",celltypes,days[1],days[2],".txt"),
+          quote = FALSE, row.names = TRUE)
+
+      results_return <- results_sub %>% as.data.frame() %>% rownames_to_column("Geneid")
+      results_return$Comparison <- paste0("Comp_",celltypes,days[1],days[2])
+      results_return
+
+  })
+}) 
+
+
+```
+
+
+
+
+
+```{r}
+sessionInfo()
+```
