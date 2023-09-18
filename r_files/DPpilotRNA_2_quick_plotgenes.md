@@ -139,7 +139,7 @@ Just D7:
 
 ``` r
 geneOI <- c("Tubb3","Mnx1","Isl2","Isl1","Neurog2","Slc18a3","Irx3",
-            "Sim1",
+            "Sim1","Neurog3","Phox2b",
             "Abca1","Fgf10",
             "Gata3","Fev","Slc17a8","Cyp26b1",
             "Pou4f2","Lpar1")
