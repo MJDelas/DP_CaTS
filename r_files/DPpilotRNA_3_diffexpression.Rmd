@@ -356,17 +356,18 @@ For a given timepoint
 ```{r}
 
 #subset 
-allgates=c("_pMN_","_p3_","_DP_")
+allgates=c("_pMN_","_p3_","_DP_","_neur_")
 #matrix
-comparisons=matrix(c("_dRA_","_500_","_dRA_","_dRA2UPSAG_","_500_","_dRA2UPSAG_"),
+comparisons=matrix(c("_500_","_UPSAG_","_UPSAG_","_dRA2UPSAG_","_dRA2UPSAG_","_dRA_",
+                    "_500_","_dRA2UPSAG_","_500_","_dRA_","_UPSAG_","_dRA_"),
                  nrow=2,
-                 ncol=3)
+                 ncol=6)
 timepoint="D7_"
 
 
 
 x=2
-y=1
+y=5
 
 # PairWiseDEseq <- lapply(c(1:length(allgates)),function (x) {
 #   lapply(c(1:ncol(timepoints)), function (y) {
