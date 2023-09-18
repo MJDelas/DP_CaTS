@@ -133,11 +133,16 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(g
 
 ### What are those neurons?
 
-Just D7
+Just D7:
+
+- dRA: Fev and Gata3 point to more anterior (5HT generation?)
 
 ``` r
-geneOI <- c("Tubb3","Sim1","Mnx1","Isl1","Isl2","Slc18a3","Gata3","Neurog2","Fev","Fgf10","Slc17a8",
-            "Abca1","Pou4f2","Irx3","Lpar1","Amd1","Cyp26b1")
+geneOI <- c("Tubb3","Mnx1","Isl2","Isl1","Neurog2","Slc18a3","Irx3",
+            "Sim1",
+            "Abca1","Fgf10",
+            "Gata3","Fev","Slc17a8","Cyp26b1",
+            "Pou4f2","Lpar1")
 
 
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Day=="D7") %>% mutate(geneid=factor(geneid, levels=geneOI)), 
@@ -154,6 +159,28 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Day=="D7") %>% mutate(gen
 ```
 
 ![](DPpilotRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+### Hoxes
+
+``` r
+#geneOI <- grep("Hoxc", dds_counts_plot$geneid, value = TRUE)
+
+geneOI <- c("Hoxa1","Hoxa3","Hoxa5","Hoxb2","Hoxb5","Hoxb7","Hoxb8","Hoxc4","Hoxc5","Hoxc6")
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Day=="D7"), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Condition),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Condition), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=colors_conditions) +
+  scale_color_manual(values=colors_conditions) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_wrap(~ geneid, scales = "free_y", ncol=3) +
+  theme_bw()
+```
+
+![](DPpilotRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 sessionInfo()
