@@ -25,7 +25,7 @@ outdir="outputs_RNApilot_1/"
 ifelse(!dir.exists(file.path(workingdir,outdir)), dir.create(file.path(workingdir,outdir)), "Directory exists")
 ```
 
-    ## [1] TRUE
+    ## [1] "Directory exists"
 
 ## Load data
 
@@ -482,6 +482,293 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(g
 ```
 
 ![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+
+# Analysis without neurons
+
+``` r
+gates=c("_pMN_","_p3_","_DP_")
+
+sub_counts <- count.table %>% 
+  as.data.frame() %>%
+  dplyr::select(contains(gates))
+
+## Make metadata file for DESeq
+
+genecolData_first <- data.frame(Sample_ID = colnames(sub_counts))
+
+genecolData_first <- genecolData_first %>% 
+  separate(Sample_ID,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) 
+
+genecolData_first <- as.data.frame(unclass(genecolData_first))
+
+
+dds <- DESeqDataSetFromMatrix(countData =  round(sub_counts),
+                                  colData = genecolData_first,
+                                  design = ~ Gate)
+```
+
+    ## converting counts to integer mode
+
+    ## Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in
+    ## design formula are characters, converting to factors
+
+``` r
+dds <- DESeq(dds)
+```
+
+    ## estimating size factors
+
+    ## estimating dispersions
+
+    ## gene-wise dispersion estimates
+
+    ## mean-dispersion relationship
+
+    ## final dispersion estimates
+
+    ## fitting model and testing
+
+    ## -- replacing outliers and refitting for 1882 genes
+    ## -- DESeq argument 'minReplicatesForReplace' = 7 
+    ## -- original counts are preserved in counts(dds)
+
+    ## estimating dispersions
+
+    ## fitting model and testing
+
+``` r
+vsd <- varianceStabilizingTransformation(dds,blind = FALSE)
+
+# Export normalized tables for plotting elsewhere
+dds_counts <- counts(dds, normalized = TRUE)
+vsd_data <- assay(vsd)
+```
+
+## Plot PCAs
+
+``` r
+## to get more than 2 components
+
+## to go it in the top ntop variable genes 
+# calculate the variance for each gene
+rv <- rowVars(vsd_data)
+```
+
+    ## Warning: useNames = NA is deprecated. Instead, specify either useNames = TRUE
+    ## or useNames = TRUE.
+
+``` r
+# select the ntop genes by variance
+ntop=500
+select <- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
+
+#pca <- prcomp(t(assay(object)[select,]))
+t_vsd <- t(vsd_data[select,])
+vsd_pca <- prcomp(t_vsd, retx=TRUE, scale. = FALSE)
+
+names(vsd_pca)
+```
+
+    ## [1] "sdev"     "rotation" "center"   "scale"    "x"
+
+``` r
+# How many PC to explain enough variance?
+#summary(vsd_pca)
+
+var_explained <-vsd_pca$sdev^2/sum(vsd_pca$sdev^2)
+plot(var_explained)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+
+``` r
+vsd_pca_plot <- vsd_pca$x %>% 
+  as.data.frame %>%
+  rownames_to_column("Sample") %>%
+  separate(Sample,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) %>%
+  mutate(DayGate=factor(paste(Day,Gate,sep="_")),
+         DayCondition=paste(Day,Condition),
+         Experiment=paste(Condition,Rep,sep="_"),
+         Gate=factor(Gate, levels=sorted_gate))
+  
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Day,shape=Gate)) +
+  scale_fill_manual(values = colors_greys) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes4_fill_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Day)) +
+  scale_fill_manual(values = color_gates) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes4_fill_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Condition,shape=Gate)) +
+  scale_fill_manual(values = colors_conditions) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes4_fill_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-16-3.png)<!-- -->
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
+  scale_fill_manual(values = color_gates) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes4_fill_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-16-4.png)<!-- -->
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayGate,shape=Condition)) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes4_fill_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-16-5.png)<!-- -->
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayCondition,shape=Gate)) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes4_fill_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-16-6.png)<!-- -->
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
+  scale_fill_manual(values = color_gates) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes4_fill_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-16-7.png)<!-- -->
+\## More components
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes4_fill_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
+  scale_fill_manual(values = color_gates) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes5_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC3: ",round(var_explained[3]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
+  scale_fill_manual(values = colors_greys) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes5_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC3: ",round(var_explained[3]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-3.png)<!-- -->
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
+  scale_fill_manual(values = color_gates) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes5_manual) +
+  labs(x=paste0("PC2: ",round(var_explained[2]*100,1),"%"),
+       y=paste0("PC3: ",round(var_explained[3]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-4.png)<!-- -->
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
+  geom_point(size=4, alpha=0.9) +
+  geom_text(nudge_x = 5) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes4_fill_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC3: ",round(var_explained[3]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-5.png)<!-- -->
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
+  #scale_fill_manual(values = colorIZ) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes5_manual) +
+  labs(x=paste0("PC4: ",round(var_explained[4]*100,1),"%"),
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-6.png)<!-- -->
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) +
+  geom_point(size=4, alpha=0.9) +
+  geom_text(nudge_x = 5) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes4_fill_manual) +
+  labs(x=paste0("PC4: ",round(var_explained[4]*100,1),"%"),
+       y=paste0("PC5: ",round(var_explained[5]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-7.png)<!-- -->
 
 ``` r
 sessionInfo()
