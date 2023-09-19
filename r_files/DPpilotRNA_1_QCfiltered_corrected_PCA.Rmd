@@ -328,53 +328,6 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
 ```
 
 
-
-# Correlation Heatmaps - based on 500 top genes 
-```{r fig.width=11,fig.height=11, eval=FALSE, include=FALSE}
-
-cor_vsd <-cor( vsd_data[select,] )
-
-names(color_gates) <- sorted_gate
-names(colors_conditions) <- sorted_conditions
-
-phen_data <- genecolData_first %>%
-  select(c("Sample_ID","Day","Condition","Gate","Rep")) %>%
-  remove_rownames() %>%
-  column_to_rownames("Sample_ID")
-ann_color_JD <- list(Gate=color_gates, Condition=colors_conditions,
-    Day = c(D5="#f6f6f6",D6="#808080",D7="#333333"),
-  Rep = c(R1="#ebeb77", R2="#77b1eb"))
-
-
-# Build the annotation for the complex heatmap
-heatmap_ann_row <- rowAnnotation(df=phen_data, col=ann_color_JD)
-heatmap_ann <- HeatmapAnnotation(df=phen_data, col=ann_color_JD, show_legend = FALSE)
-
-
-
-# Annotated heatmap with selected colors
-hm_colors = colorRampPalette(rev(brewer.pal(n = 11, name = "RdBu")))(100)
-
-
-Heatmap(cor_vsd, name="Correlation", col=hm_colors,
-        cluster_columns = TRUE, cluster_rows = TRUE,
-        #show_column_dend = FALSE,
-        #row_dend_side = "right", column_dend_side = "bottom",
-        # cluster methods for rows and columns
-        clustering_distance_columns = function(x) as.dist(1 - cor(t(x))),
-        clustering_method_columns = 'ward.D2',
-        clustering_distance_rows = function(x) as.dist(1 - cor(t(x))),
-        clustering_method_rows = 'ward.D2',
-        column_dend_height = unit(2, "cm"), row_dend_width = unit(2, "cm"),
-        row_names_gp = gpar(fontsize = 10),column_names_gp = gpar(fontsize = 10),
-        left_annotation = heatmap_ann_row, top_annotation = heatmap_ann,
-        column_title = "Pearson Correlation - Top 500 genes")
-
-
-
-```
-
-
 ## Export files 
 
 ```{r }
@@ -645,6 +598,51 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
   labs(x=paste0("PC4: ",round(var_explained[4]*100,1),"%"),
        y=paste0("PC5: ",round(var_explained[5]*100,1),"%")) +
   theme_bw(base_size=16)
+
+
+```
+
+# Correlation Heatmaps - based on 500 top genes 
+```{r fig.width=11,fig.height=11, eval=TRUE, include=TRUE}
+
+cor_vsd <-cor( vsd_data[select,] )
+
+names(color_gates) <- sorted_gate
+names(colors_conditions) <- sorted_conditions
+
+phen_data <- genecolData_first %>%
+  select(c("Sample_ID","Day","Condition","Gate","Rep")) %>%
+  remove_rownames() %>%
+  column_to_rownames("Sample_ID")
+ann_color_JD <- list(Gate=color_gates, Condition=colors_conditions,
+    Day = c(D5="#f6f6f6",D6="#808080",D7="#333333"),
+  Rep = c(R1="#ebeb77", R2="#77b1eb"))
+
+
+# Build the annotation for the complex heatmap
+heatmap_ann_row <- rowAnnotation(df=phen_data, col=ann_color_JD)
+heatmap_ann <- HeatmapAnnotation(df=phen_data, col=ann_color_JD, show_legend = FALSE)
+
+
+
+# Annotated heatmap with selected colors
+hm_colors = colorRampPalette(rev(brewer.pal(n = 11, name = "RdBu")))(100)
+
+
+Heatmap(cor_vsd, name="Correlation", col=hm_colors,
+        cluster_columns = TRUE, cluster_rows = TRUE,
+        #show_column_dend = FALSE,
+        #row_dend_side = "right", column_dend_side = "bottom",
+        # cluster methods for rows and columns
+        clustering_distance_columns = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_columns = 'ward.D2',
+        clustering_distance_rows = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_rows = 'ward.D2',
+        column_dend_height = unit(2, "cm"), row_dend_width = unit(2, "cm"),
+        row_names_gp = gpar(fontsize = 10),column_names_gp = gpar(fontsize = 10),
+        left_annotation = heatmap_ann_row, top_annotation = heatmap_ann,
+        column_title = "Pearson Correlation - Top 500 genes")
+
 
 
 ```

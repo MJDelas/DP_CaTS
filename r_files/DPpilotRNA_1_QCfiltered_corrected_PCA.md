@@ -409,8 +409,6 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
 
 ![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-9-7.png)<!-- -->
 
-# Correlation Heatmaps - based on 500 top genes
-
 ## Export files
 
 ``` r
@@ -453,7 +451,7 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(g
   theme_bw()
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
 
 ``` r
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(geneid, levels=geneOI)), 
@@ -469,7 +467,7 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(g
   theme_bw()
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
 
 # Analysis without neurons
 
@@ -567,7 +565,7 @@ var_explained <-vsd_pca$sdev^2/sum(vsd_pca$sdev^2)
 plot(var_explained)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 vsd_pca_plot <- vsd_pca$x %>% 
@@ -589,7 +587,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Day,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Day)) +
@@ -602,7 +600,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Day)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-15-2.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Condition,shape=Gate)) +
@@ -615,7 +613,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Condition,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-3.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-15-3.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
@@ -628,7 +626,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-4.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-15-4.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayGate,shape=Condition)) +
@@ -640,7 +638,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayGate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-5.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-15-5.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayCondition,shape=Gate)) +
@@ -652,7 +650,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayCondition,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-6.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-15-6.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
@@ -665,7 +663,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-7.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-15-7.png)<!-- -->
 \## More components
 
 ``` r
@@ -678,7 +676,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
@@ -691,7 +689,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
@@ -704,7 +702,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-17-3.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-3.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
@@ -717,7 +715,7 @@ ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-17-4.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-4.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition,label=Sample)) +
@@ -731,7 +729,7 @@ ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition,label=Sample)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-17-5.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-5.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
@@ -744,7 +742,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-17-6.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-6.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
@@ -757,7 +755,7 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-17-7.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-7.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) +
@@ -770,7 +768,51 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-17-8.png)<!-- -->
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-16-8.png)<!-- -->
+
+# Correlation Heatmaps - based on 500 top genes
+
+``` r
+cor_vsd <-cor( vsd_data[select,] )
+
+names(color_gates) <- sorted_gate
+names(colors_conditions) <- sorted_conditions
+
+phen_data <- genecolData_first %>%
+  select(c("Sample_ID","Day","Condition","Gate","Rep")) %>%
+  remove_rownames() %>%
+  column_to_rownames("Sample_ID")
+ann_color_JD <- list(Gate=color_gates, Condition=colors_conditions,
+    Day = c(D5="#f6f6f6",D6="#808080",D7="#333333"),
+  Rep = c(R1="#ebeb77", R2="#77b1eb"))
+
+
+# Build the annotation for the complex heatmap
+heatmap_ann_row <- rowAnnotation(df=phen_data, col=ann_color_JD)
+heatmap_ann <- HeatmapAnnotation(df=phen_data, col=ann_color_JD, show_legend = FALSE)
+
+
+
+# Annotated heatmap with selected colors
+hm_colors = colorRampPalette(rev(brewer.pal(n = 11, name = "RdBu")))(100)
+
+
+Heatmap(cor_vsd, name="Correlation", col=hm_colors,
+        cluster_columns = TRUE, cluster_rows = TRUE,
+        #show_column_dend = FALSE,
+        #row_dend_side = "right", column_dend_side = "bottom",
+        # cluster methods for rows and columns
+        clustering_distance_columns = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_columns = 'ward.D2',
+        clustering_distance_rows = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_rows = 'ward.D2',
+        column_dend_height = unit(2, "cm"), row_dend_width = unit(2, "cm"),
+        row_names_gp = gpar(fontsize = 10),column_names_gp = gpar(fontsize = 10),
+        left_annotation = heatmap_ann_row, top_annotation = heatmap_ann,
+        column_title = "Pearson Correlation - Top 500 genes")
+```
+
+![](DPpilotRNA_1_QCfiltered_corrected_PCA_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 ``` r
 sessionInfo()
@@ -811,24 +853,25 @@ sessionInfo()
     ##  [7] R6_2.5.1               DBI_1.1.3              colorspace_2.1-0      
     ## [10] GetoptLong_1.0.5       withr_2.5.0            tidyselect_1.2.0      
     ## [13] bit_4.0.5              compiler_4.2.2         cli_3.6.1             
-    ## [16] DelayedArray_0.24.0    labeling_0.4.2         scales_1.2.1          
-    ## [19] digest_0.6.33          rmarkdown_2.22         XVector_0.38.0        
-    ## [22] pkgconfig_2.0.3        htmltools_0.5.5        highr_0.10            
-    ## [25] fastmap_1.1.1          rlang_1.1.1            GlobalOptions_0.1.2   
-    ## [28] rstudioapi_0.14        RSQLite_2.3.1          farver_2.1.1          
-    ## [31] shape_1.4.6            generics_0.1.3         jsonlite_1.8.5        
-    ## [34] vroom_1.6.3            BiocParallel_1.32.6    RCurl_1.98-1.12       
-    ## [37] magrittr_2.0.3         GenomeInfoDbData_1.2.9 Matrix_1.5-4.1        
-    ## [40] Rcpp_1.0.10            munsell_0.5.0          fansi_1.0.4           
-    ## [43] lifecycle_1.0.3        stringi_1.7.12         yaml_2.3.7            
-    ## [46] zlibbioc_1.44.0        blob_1.2.4             parallel_4.2.2        
-    ## [49] crayon_1.5.2           lattice_0.21-8         Biostrings_2.66.0     
-    ## [52] annotate_1.76.0        circlize_0.4.15        hms_1.1.3             
-    ## [55] KEGGREST_1.38.0        locfit_1.5-9.8         knitr_1.43            
-    ## [58] pillar_1.9.0           rjson_0.2.21           geneplotter_1.76.0    
-    ## [61] codetools_0.2-19       XML_3.99-0.14          glue_1.6.2            
-    ## [64] evaluate_0.21          png_0.1-8              vctrs_0.6.3           
-    ## [67] tzdb_0.4.0             foreach_1.5.2          gtable_0.3.3          
-    ## [70] clue_0.3-64            cachem_1.0.8           xfun_0.39             
-    ## [73] xtable_1.8-4           iterators_1.0.14       AnnotationDbi_1.60.2  
-    ## [76] memoise_2.0.1          cluster_2.1.4          timechange_0.2.0
+    ## [16] Cairo_1.6-0            DelayedArray_0.24.0    labeling_0.4.2        
+    ## [19] scales_1.2.1           digest_0.6.33          rmarkdown_2.22        
+    ## [22] XVector_0.38.0         pkgconfig_2.0.3        htmltools_0.5.5       
+    ## [25] highr_0.10             fastmap_1.1.1          rlang_1.1.1           
+    ## [28] GlobalOptions_0.1.2    rstudioapi_0.14        RSQLite_2.3.1         
+    ## [31] farver_2.1.1           shape_1.4.6            generics_0.1.3        
+    ## [34] jsonlite_1.8.5         vroom_1.6.3            BiocParallel_1.32.6   
+    ## [37] RCurl_1.98-1.12        magrittr_2.0.3         GenomeInfoDbData_1.2.9
+    ## [40] Matrix_1.5-4.1         Rcpp_1.0.10            munsell_0.5.0         
+    ## [43] fansi_1.0.4            lifecycle_1.0.3        stringi_1.7.12        
+    ## [46] yaml_2.3.7             zlibbioc_1.44.0        blob_1.2.4            
+    ## [49] parallel_4.2.2         crayon_1.5.2           lattice_0.21-8        
+    ## [52] Biostrings_2.66.0      annotate_1.76.0        circlize_0.4.15       
+    ## [55] hms_1.1.3              KEGGREST_1.38.0        magick_2.7.4          
+    ## [58] locfit_1.5-9.8         knitr_1.43             pillar_1.9.0          
+    ## [61] rjson_0.2.21           geneplotter_1.76.0     codetools_0.2-19      
+    ## [64] XML_3.99-0.14          glue_1.6.2             evaluate_0.21         
+    ## [67] png_0.1-8              vctrs_0.6.3            tzdb_0.4.0            
+    ## [70] foreach_1.5.2          gtable_0.3.3           clue_0.3-64           
+    ## [73] cachem_1.0.8           xfun_0.39              xtable_1.8-4          
+    ## [76] iterators_1.0.14       AnnotationDbi_1.60.2   memoise_2.0.1         
+    ## [79] cluster_2.1.4          timechange_0.2.0
