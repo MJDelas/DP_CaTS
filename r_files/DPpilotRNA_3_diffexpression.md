@@ -49,6 +49,13 @@ ifelse(!dir.exists(file.path(workingdir,outdir,suboutdir3)), dir.create(file.pat
 
     ## [1] "Directory exists"
 
+``` r
+suboutdir4="output_between_gates_ignoringothers/"
+ifelse(!dir.exists(file.path(workingdir,outdir,suboutdir4)), dir.create(file.path(workingdir,outdir,suboutdir4)), "Directory exists")
+```
+
+    ## [1] "Directory exists"
+
 ## Load data
 
 For RNA analysis, we are using the output of star_salmon so the import
@@ -515,6 +522,124 @@ PairWiseDEseq <-  lapply(c(1:length(timepoint)),function (i) {
         }
     })
   })
+})
+```
+
+## Between cell types: ignoring signaling regime and timepoint
+
+``` r
+count_matrix <- txi.salmon$counts %>%
+  as.data.frame()
+
+
+#subset 
+
+#matrix
+allgates=matrix(c("_pMN_","_p3_","_pMN_","_DP_","_p3_","_DP_"),
+                 nrow=2,
+                 ncol=3)
+
+comparisons <- allgates
+
+y=3
+
+
+## many comparisons do not have 2 reps and 2 conditions
+
+PairWiseDEseq <-
+    lapply(c(1:ncol(allgates)), function (y) {
+        celltypes <- allgates[,y]
+        sub_counts <- count_matrix %>%
+          dplyr::select(contains(celltypes))
+  
+      
+          ## Make metadata file for DESeq
+          genecolData_sub <- data.frame(Sample = colnames(sub_counts))
+          genecolData_sub <- genecolData_sub %>% 
+            separate(Sample,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) %>%
+            mutate(DayGate=factor(paste(Day,Gate,sep="_")),
+                  DayCondition=paste(Day,Condition),
+                  Experiment=paste(Condition,Rep,sep="_"),
+                  Gate=factor(Gate, levels=sorted_gate))
+          genecolData_sub <- as.data.frame(unclass(genecolData_sub))
+          
+          
+          dds_sub <- DESeqDataSetFromMatrix(countData =  round(sub_counts),
+                                  colData = genecolData_sub,
+                                  design = ~ Gate)
+              
+          dds_sub <- DESeq(dds_sub)
+          
+          vsd_sub <- varianceStabilizingTransformation(dds_sub,blind = FALSE)
+          
+          # Export normalized tables for plotting elsewhere
+          dds_sub_counts <- counts(dds_sub, normalized = TRUE)
+          vsd_sub_data <- assay(vsd_sub)
+          
+          results_sub <- results(dds_sub)
+    
+          # color significant
+          results_sub_plot1 <- results_sub %>%
+            as.data.frame() %>%
+            rownames_to_column("geneid") %>%
+            mutate(color_sig=case_when(padj < 0.1 & padj > 0.01 ~ "under01",
+                                       padj < 0.01 & padj > 0.001 ~ "under001",
+                                       padj < 0.001 & padj >0 ~ "under0001",
+                                       TRUE ~ "over01"))
+          
+          #threshold <- 8
+          plot_ma <- ggplot(results_sub_plot1 %>% as.data.frame(), aes(x=baseMean, y=log2FoldChange, color=color_sig, label=geneid)) +
+              geom_point(size=1) +
+              # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange > threshold,],
+              #           aes(x=baseMean, y=threshold), shape = 2, colour="#d83a00") +
+              # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange < -threshold,],
+              #           aes(x=baseMean, y=-threshold), shape = 2, colour="#d83a00") +
+              #ylim(-threshold,threshold) +
+              scale_x_log10() +
+              scale_color_manual(values = c("gray30","#d83a00","#ff9b76","#ffd4c4")) +
+              geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange > 2),
+                      nudge_y = 30,
+                      #nudge_x=-10,
+                      #force_pull   = 10,
+                      force         = 65,
+                      max.overlaps = Inf,
+                      box.padding = 0.5,
+                      segment.color = "grey50",
+                      direction     = "both") +
+              geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange < -2),
+                      nudge_y = -30,
+                      #nudge_x=-10,
+                      #force_pull   = 10,
+                      force         = 65,
+                      max.overlaps = Inf,
+                      box.padding = 0.5,
+                      segment.color = "grey50",
+                      direction     = "both") +
+              ylab(paste0("log2 Fold Change ", resultsNames(dds_sub)[2] ," RNA")) +
+              ggtitle(paste0("Results ",resultsNames(dds_sub)[2])) +
+              theme_bw() 
+          
+          # print plot
+          ggsave(paste0(workingdir,outdir,suboutdir4,"MAplot_",resultsNames(dds_sub)[2],".pdf"), plot=plot_ma,
+           width=5, height=3, units="in", useDingbats=FALSE)
+          
+    
+          ## Export files
+          
+          write.table(dds_sub_counts,
+          file = paste0(workingdir,outdir,suboutdir4,"CountsNormalized_",resultsNames(dds_sub)[2],".txt"),
+              quote = FALSE, row.names = TRUE)
+          write.csv(vsd_sub_data,
+              paste0(workingdir,outdir,suboutdir4,"VSData_",resultsNames(dds_sub)[2],".csv"),
+              quote = FALSE)
+          write.table(results_sub,
+              file = paste0(workingdir,outdir,suboutdir4,"Results_DESeq_",resultsNames(dds_sub)[2],".txt"),
+              quote = FALSE, row.names = TRUE)
+    
+          results_return <- results_sub %>% as.data.frame() %>% rownames_to_column("Geneid")
+          #results_return$Comparison <- paste0("Comp_",timepoints,celltypes[1],celltypes[2])
+          results_return$Comparison <- paste0("Comp_",resultsNames(dds_sub)[2])
+          results_return
 })
 ```
 
