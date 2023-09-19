@@ -618,7 +618,15 @@ ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
   labs(x=paste0("PC2: ",round(var_explained[2]*100,1),"%"),
        y=paste0("PC3: ",round(var_explained[3]*100,1),"%")) +
   theme_bw(base_size=16)
-
+ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition,label=Sample)) +
+  scale_fill_manual(values = color_gates) +
+  geom_point(size=4, alpha=0.9) +
+  geom_text(nudge_x = 10) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes5_manual) +
+  labs(x=paste0("PC2: ",round(var_explained[2]*100,1),"%"),
+       y=paste0("PC3: ",round(var_explained[3]*100,1),"%")) +
+  theme_bw(base_size=16)
 
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
   geom_point(size=4, alpha=0.9) +

@@ -732,6 +732,20 @@ ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
 ![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-4.png)<!-- -->
 
 ``` r
+ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition,label=Sample)) +
+  scale_fill_manual(values = color_gates) +
+  geom_point(size=4, alpha=0.9) +
+  geom_text(nudge_x = 10) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes5_manual) +
+  labs(x=paste0("PC2: ",round(var_explained[2]*100,1),"%"),
+       y=paste0("PC3: ",round(var_explained[3]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-5.png)<!-- -->
+
+``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
   geom_point(size=4, alpha=0.9) +
   geom_text(nudge_x = 5) +
@@ -742,7 +756,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-5.png)<!-- -->
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-6.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
@@ -755,7 +769,7 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-6.png)<!-- -->
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-7.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) +
@@ -768,7 +782,7 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
   theme_bw(base_size=16)
 ```
 
-![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-7.png)<!-- -->
+![](DPpilotRNA_1_corrected_PCA_files/figure-gfm/unnamed-chunk-17-8.png)<!-- -->
 
 ``` r
 sessionInfo()
