@@ -507,6 +507,9 @@ PairWiseDEseq <-  lapply(c(1:length(timepoint)),function (i) {
 
 ## Between cell types: ignoring signaling regime and timepoint
 
+- to get the main genes, but I will also intersect all the different comparisons in the next script
+- exclude D7 dRA p3 because they are Floor plate
+
 ```{r message = FALSE, warning=FALSE}
 
 count_matrix <- txi.salmon$counts %>%
@@ -514,7 +517,7 @@ count_matrix <- txi.salmon$counts %>%
 
 
 #subset 
-
+treatment=c("_500_","_UPSAG_","_dRA2UPSAG_")
 #matrix
 allgates=matrix(c("_pMN_","_p3_","_pMN_","_DP_","_p3_","_DP_"),
                  nrow=2,
@@ -531,7 +534,7 @@ PairWiseDEseq <-
     lapply(c(1:ncol(allgates)), function (y) {
         celltypes <- allgates[,y]
         sub_counts <- count_matrix %>%
-          dplyr::select(contains(celltypes))
+          dplyr::select(contains(celltypes) & contains(treatment))
   
       
           ## Make metadata file for DESeq
