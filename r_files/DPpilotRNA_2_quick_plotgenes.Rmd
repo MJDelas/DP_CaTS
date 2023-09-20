@@ -99,7 +99,9 @@ dds_counts_plot <- dds_counts %>%
 
 ```{r fig.height=9, fig.width=9}
 
-geneOI <- c("Sox2","Dbx1","Irx3","Pax6","Nkx6-1","Olig2","Nkx2-2","Foxa2","Shh","Arx","Tubb3","Sim1","Mnx1")
+geneOI <- c("Sox2",
+            "Dbx1","Irx3","Pax6","Nkx6-1","Olig2","Nkx2-2","Foxa2","Shh","Arx",
+            "Tubb3","Sim1","Mnx1")
 
 
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(geneid, levels=geneOI)), 
@@ -157,11 +159,13 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(g
 Just D7:
 
 - dRA: Fev and Gata3 point to more anterior (5HT generation?)
+- dRA also high in Pou3f1 (Alcam), expressed in spinal accessory column (Cervical level)
 
-```{r fig.height=6, fig.width=9}
+```{r fig.height=6, fig.width=10}
 
-geneOI <- c("Tubb3","Mnx1","Isl2","Isl1","Neurog2","Slc18a3","Irx3",
-            "Sim1","Neurog3","Phox2b",
+geneOI <- c("Tubb3","Mnx1","Isl2","Isl1","Neurog2","Lhx3","Lhx1",
+            "Slc18a3","Irx3",
+            "Nkx2-2","Sim1","Neurog3","Phox2b","Pou3f1","Alcam",
             "Abca1","Fgf10",
             "Gata3","Fev","Slc17a8","Cyp26b1",
             "Pou4f2","Lpar1")
@@ -176,7 +180,7 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Day=="D7") %>% mutate(gen
   scale_fill_manual(values=colors_conditions) +
   scale_color_manual(values=colors_conditions) +
   scale_shape_manual(values=shapes4_fill_manual) +
-  facet_wrap(~ geneid, scales = "free_y", ncol=3) +
+  facet_wrap(~ geneid, scales = "free_y", ncol=4) +
   theme_bw()
 
 ```
