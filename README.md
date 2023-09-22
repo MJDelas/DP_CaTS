@@ -8,4 +8,5 @@ Analysis of CaTs-ATAC/RNA
     - Corrected labels and QC filtered [PCA](r_files/DPpilotRNA_1_QCfiltered_corrected_PCA.md)
     - Summary PCA [for sharing](r_files/DPpilotRNA_1_summary_share.md)
     - [Quick gene ploting](r_files/DPpilotRNA_2_quick_plotgenes.md)
-    - Pilot differential expression [ongoing](r_files/DPpilotRNA_3_diffexpression.md)
+    - Differential expression [scripts](r_files/DPpilotRNA_3_diffexpression.md)
+    - [Import previous and plot](r_files/DPpilotRNA_4_diffexpression_import.md)
