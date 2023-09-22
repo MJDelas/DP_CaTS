@@ -647,6 +647,110 @@ PairWiseDEseq <-
 })
 ```
 
+### Targetted p3 analysis
+
+Compare upsag d7 and 500 d6. Is anything different from 500 d7 vs d6?
+
+``` r
+samples_wanted <- c("D7_UPSAG_p3","D6_500_p3")
+        # timepoints <- timepoint[i]
+        # celltypes <- allgates[x]
+        # conditions <- comparisons[,y]
+        sub_counts <- count_matrix %>%
+          dplyr::select(contains(samples_wanted))
+        
+
+        ## Make metadata file for DESeq
+        genecolData_sub <- data.frame(Sample = colnames(sub_counts))
+        genecolData_sub <- genecolData_sub %>% 
+          separate(Sample,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) %>%
+          mutate(DayGate=factor(paste(Day,Gate,sep="_")),
+                DayCondition=paste(Day,Condition),
+                Experiment=paste(Condition,Rep,sep="_"),
+                Gate=factor(Gate, levels=sorted_gate))
+        genecolData_sub <- as.data.frame(unclass(genecolData_sub))
+           
+        dds_sub <- DESeqDataSetFromMatrix(countData = round(sub_counts),
+                                      colData = genecolData_sub,
+                                      design = ~ Day)
+        
+        dds_sub <- DESeq(dds_sub)
+        
+        vsd_sub <- varianceStabilizingTransformation(dds_sub,blind = FALSE)
+        
+        # Export normalized tables for plotting elsewhere
+        dds_sub_counts <- counts(dds_sub, normalized = TRUE)
+        vsd_sub_data <- assay(vsd_sub)
+        
+        results_sub <- results(dds_sub)
+        
+        ## plot MA custom plot 
+        
+        #plotMA(results_sub,ylim=c(-8,8))
+        
+        # color significant
+        results_sub_plot1 <- results_sub %>%
+          as.data.frame() %>%
+          rownames_to_column("geneid") %>%
+          mutate(color_sig=case_when(padj < 0.1 & padj > 0.01 ~ "under01",
+                                     padj < 0.01 & padj > 0.001 ~ "under001",
+                                     padj < 0.001 & padj >0 ~ "under0001",
+                                     TRUE ~ "over01"))
+        
+        #threshold <- 8
+        plot_ma <-ggplot(results_sub_plot1 %>% as.data.frame(), aes(x=baseMean, y=log2FoldChange, color=color_sig, label=geneid)) +
+            geom_point(size=1) +
+            # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange > threshold,],
+            #           aes(x=baseMean, y=threshold), shape = 2, colour="#d83a00") +
+            # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange < -threshold,],
+            #           aes(x=baseMean, y=-threshold), shape = 2, colour="#d83a00") +
+            #ylim(-threshold,threshold) +
+            scale_x_log10() +
+            scale_color_manual(values = c("gray30","#d83a00","#ff9b76","#ffd4c4")) +
+            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange > 0),
+                    nudge_y = 20,
+                    #nudge_x=-10,
+                    #force_pull   = 10,
+                    force         = 65,
+                    max.overlaps = Inf,
+                    box.padding = 0.5,
+                    segment.color = "grey50",
+                    direction     = "both") +
+            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange < 0),
+                    nudge_y = -20,
+                    #nudge_x=-10,
+                    #force_pull   = 10,
+                    force         = 65,
+                    max.overlaps = Inf,
+                    box.padding = 0.5,
+                    segment.color = "grey50",
+                    direction     = "both") +
+            ylab(paste0("log2 Fold Change ",resultsNames(dds_sub)[2]," RNA")) +
+            ggtitle(paste0("Comparison ",samples_wanted[1]," and ",samples_wanted[2],", order ",resultsNames(dds_sub)[2])) +
+            theme_bw() 
+        
+        # print plot
+          ggsave(paste0(workingdir,outdir,"MAplot_",samples_wanted[1]," and ",samples_wanted[2],", order ", resultsNames(dds_sub)[2],".pdf"), plot=plot_ma,
+           width=5, height=3, units="in", useDingbats=FALSE)
+        
+        
+        ## Export files
+        
+        write.table(dds_sub_counts,
+        file = paste0(workingdir,outdir,"CountsNormalized_",samples_wanted[1]," and ",samples_wanted[2],", order ", resultsNames(dds_sub)[2],".txt"),
+            quote = FALSE, row.names = TRUE)
+        write.csv(vsd_sub_data,
+            paste0(workingdir,outdir,"VSData_",samples_wanted[1]," and ",samples_wanted[2],", order ",resultsNames(dds_sub)[2],".csv"),
+            quote = FALSE)
+        write.table(results_sub,
+            file = paste0(workingdir,outdir,"Results_DESeq_",samples_wanted[1]," and ",samples_wanted[2],", order ", resultsNames(dds_sub)[2],".txt"),
+            quote = FALSE, row.names = TRUE)
+
+        # results_return <- results_sub %>% as.data.frame() %>% rownames_to_column("Geneid")
+        # results_return$Comparison <- paste0("Comp_",resultsNames(dds_sub)[2])
+        # results_return
+```
+
 ``` r
 sessionInfo()
 ```
