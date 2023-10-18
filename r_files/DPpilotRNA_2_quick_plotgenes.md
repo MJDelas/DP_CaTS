@@ -329,6 +329,48 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","U
 
 ![](DPpilotRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
 
+### Wnt genes
+
+following Agalliu et al
+
+``` r
+geneOI <- c("Wnt4","Wnt5a","Wnt5b","Wnt1","Wnt7a","Wnt7b")
+
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Day,y=counts_norm)) +
+  stat_summary(aes(fill=Gate),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=color_gates) +
+  scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+```
+
+![](DPpilotRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+``` r
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         filter(Gate !="neur") %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Day),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Day), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  #scale_fill_manual(values=color_gates) +
+  #scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+```
+
+![](DPpilotRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+
 ``` r
 sessionInfo()
 ```
