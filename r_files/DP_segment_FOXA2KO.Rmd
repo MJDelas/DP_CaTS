@@ -84,14 +84,14 @@ ggplot(segment_cp_clean %>% filter(ImageNumber=="4"), aes(x=Location_Center_X,y=
 
 ```
 
-```{r fig.height=15}
+```{r fig.width=14, fig.height=12}
 
 ggplot(segment_cp_clean, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   #geom_point(size=0.01) +
   geom_point(size=0.1, aes(color=Intensity_MeanIntensity_FOXA2_Image))+
   scale_color_gradient2(low = "grey", mid = "white", high = "brown") +
   facet_wrap( ~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL) +
   theme_bw()
 
 ggplot(segment_cp_clean, aes(x=Location_Center_X,y=-Location_Center_Y)) +
@@ -99,18 +99,18 @@ ggplot(segment_cp_clean, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   geom_point(size=0.1, aes(color=Intensity_MeanIntensity_SOX2_Image))+
   scale_color_gradient2(low = "grey", mid = "white", high = "brown") +
   facet_wrap( ~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 
 ```
 
 ## Find thresholds
 
-```{r fig.width=15}
+```{r fig.width=12, fig.height=12}
 sox2_thres = 0.25
 nkx22_thress = 0.35
 olig2_thress = 0.2
-foxa2_thress = 0.15
+foxa2_thress = 0.3
 
 ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_SOX2_Image, y=Intensity_MeanIntensity_OLIG2_Image)) +
   geom_hex(binwidth = c(0.04, 0.04))  +
@@ -119,7 +119,7 @@ ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_SOX2_Image, y=Intensity_M
   scale_x_log10()+
   scale_y_log10() +
   facet_wrap(~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 
 ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_SOX2_Image, y=Intensity_MeanIntensity_NKX22_Image)) +
@@ -129,7 +129,7 @@ ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_SOX2_Image, y=Intensity_M
   scale_x_log10()+
   scale_y_log10() +
   facet_wrap(~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 
 ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_OLIG2_Image, y=Intensity_MeanIntensity_NKX22_Image)) +
@@ -139,7 +139,7 @@ ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_OLIG2_Image, y=Intensity_
   scale_x_log10()+
   scale_y_log10() +
   facet_wrap(~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 
 ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_FOXA2_Image, y=Intensity_MeanIntensity_NKX22_Image)) +
@@ -149,7 +149,22 @@ ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_FOXA2_Image, y=Intensity_
   scale_x_log10()+
   scale_y_log10() +
   facet_wrap(~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  theme_bw()
+
+```
+
+```{r fig.width=14, fig.height=12}
+
+ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_FOXA2_Image, y=Intensity_MeanIntensity_NKX22_Image)) +
+  geom_point(size=0.2, aes(color=Intensity_MeanIntensity_FOXA2_Image)) +
+  scale_color_gradient2(low = "grey", mid = "white", high = "brown") +
+  geom_vline(xintercept=foxa2_thress,  linetype="dashed", color = "blue") +
+  geom_hline(yintercept=nkx22_thress,  linetype="dashed", color = "blue") +
+  scale_x_log10()+
+  scale_y_log10() +
+  facet_wrap(~ embryoID) +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 
 ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_OLIG2_Image, y=Intensity_MeanIntensity_NKX22_Image)) +
@@ -160,8 +175,31 @@ ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_OLIG2_Image, y=Intensity_
   scale_x_log10()+
   scale_y_log10() +
   facet_wrap(~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
+
+ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_SOX2_Image, y=Intensity_MeanIntensity_NKX22_Image)) +
+  geom_point(size=0.2, aes(color=Intensity_MeanIntensity_FOXA2_Image)) +
+  scale_color_gradient2(low = "grey", mid = "white", high = "brown") +
+  geom_vline(xintercept=sox2_thres,  linetype="dashed", color = "blue") +
+  geom_hline(yintercept=nkx22_thress,  linetype="dashed", color = "blue") +
+  scale_x_log10()+
+  scale_y_log10() +
+  facet_wrap(~ embryoID) +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  theme_bw()
+
+ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_FOXA2_Image, y=Intensity_MeanIntensity_SOX2_Image)) +
+  geom_point(size=0.2, aes(color=Intensity_MeanIntensity_FOXA2_Image)) +
+  scale_color_gradient2(low = "grey", mid = "white", high = "brown") +
+  geom_vline(xintercept=foxa2_thress,  linetype="dashed", color = "blue") +
+  geom_hline(yintercept=sox2_thres,  linetype="dashed", color = "blue") +
+  # scale_x_log10()+
+  # scale_y_log10() +
+  facet_wrap(~ embryoID) +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  theme_bw()
+
 
 ```
 
@@ -181,10 +219,10 @@ Classification based on Intensity_MeanIntensity_ANTIBODY_Image and the threshold
 sox2_thres = 0.25
 nkx22_thress = 0.35
 olig2_thress = 0.2
-foxa2_thress = 0.15
+foxa2_thress = 0.3
 
 
-```{r fig.width=15}
+```{r fig.width=12, fig.height=12}
 
 full_classified <- segment_cp_clean %>%
   mutate(celltype=if_else(Intensity_MeanIntensity_OLIG2_Image > olig2_thress & Intensity_MeanIntensity_NKX22_Image > nkx22_thress, "DP",
@@ -197,23 +235,24 @@ ggplot(full_classified, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   #geom_point(size=0.01) +
   geom_point(size=0.1, aes(color=celltype))+
   facet_wrap( ~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 
 ggplot(full_classified, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   #geom_point(size=0.01) +
   geom_point(size=0.1, aes(color=foxa2_positive))+
   facet_wrap( ~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 
 ```
 
-#### Filter background Nkx22 cells based on position
-Cell that are positioned more than 5 standard deviations away from the mean (dashed red line) of the pMN population will be excluded. Visualize the excluded cells below.
+#### Filter background SOX2+ FOXA2+ cells based on position
+
+Cell that are positioned more than 5 standard deviations away from the mean of the pMN population (dashed red line) will be excluded. Visualize the excluded cells below.
 
 
-```{r fig.width=15}
+```{r fig.width=14, fig.height=12}
 full_classified_mean_pmnposition <- full_classified %>%
   filter(celltype %in% c("pMN")) %>%
   group_by(ImageNumber) %>%
@@ -238,7 +277,7 @@ ggplot(full_classified, aes(x=Location_Center_X, y=-Location_Center_Y)) +
   expand_limits(y=c(0,-1024),x=c(0,1024)) +
   geom_hline(data=full_classified_mean_pmnposition, aes(yintercept=-(ave_y+5*sd_y)),linetype='dashed', col = 'red') +
   facet_wrap(~ embryoID) +
-  coord_fixed(ratio = 1) +
+  # coord_fixed(ratio = 1) +
   theme_bw(base_size = 8)
 
 ```
@@ -257,7 +296,7 @@ full_classified_to_be_filtered <- full_classified_mean_pmnposition %>%
 
 Re-classify after positional filter
 
-```{r fig.width=15}
+```{r fig.width=12, fig.height=12}
 
 classified_filtered <- full_classified %>%
   left_join(full_classified_to_be_filtered, by = c("ImageNumber","embryoID")) %>% 
@@ -268,13 +307,13 @@ classified_filtered <- full_classified %>%
 ggplot(classified_filtered, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   geom_point(size=0.1, aes(color=celltype))+
   facet_wrap( ~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 
 ggplot(classified_filtered, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   geom_point(size=0.1, aes(color=foxa2_positive))+
   facet_wrap( ~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 
 ```
@@ -284,7 +323,7 @@ ggplot(classified_filtered, aes(x=Location_Center_X,y=-Location_Center_Y)) +
 
 ```{r}
 
-classified_filtered
+# classified_filtered
 
 classified_filtered_celltype_counts <- classified_filtered %>%
   mutate(celltype = factor(celltype, levels = c("DP","p3","pMN","Sox2_notp3","othercell"))) %>%
@@ -404,20 +443,51 @@ classified_filtered_celltype_and_FOXA2_prop_ave <- classified_filtered_celltype_
   summarise(mean_propDP=mean(prop_DP),
          sd_propDP=sd(prop_DP),
          sd_propFOXA2=sd(prop_FOXA2),
-         mean_propFOXA2=mean(prop_FOXA2))
+         mean_propFOXA2=mean(prop_FOXA2),
+         mean_NTcell=mean(NTcells))
 
 
 ggplot(classified_filtered_celltype_and_FOXA2_prop_ave, aes(x=embryorealID, y=mean_propDP)) +
   geom_col(aes(fill=embryorealID)) +
-  geom_point(data = classified_filtered_celltype_and_FOXA2_prop, aes(x=embryorealID, y=prop_DP, fill=embryorealID), color="black", shape=21) +
+  geom_point(data = classified_filtered_celltype_and_FOXA2_prop, aes(x=embryorealID, y=prop_DP, fill=embryorealID,shape=pos), color="black") +
   theme_bw() +theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 ggplot(classified_filtered_celltype_and_FOXA2_prop_ave, aes(x=embryorealID, y=mean_propFOXA2)) +
   geom_col(aes(fill=embryorealID)) +
-  geom_point(data = classified_filtered_celltype_and_FOXA2_prop, aes(x=embryorealID, y=prop_FOXA2, fill=embryorealID), color="black", shape=21) +
+  geom_point(data = classified_filtered_celltype_and_FOXA2_prop, aes(x=embryorealID, y=prop_FOXA2, fill=embryorealID,shape=pos), color="black") +
+  theme_bw() +theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+ggplot(classified_filtered_celltype_and_FOXA2_prop_ave, aes(x=embryorealID, y=mean_NTcell)) +
+  geom_col(aes(fill=embryorealID)) +
+  geom_point(data = classified_filtered_celltype_and_FOXA2_prop, aes(x=embryorealID, y=NTcells, fill=embryorealID,shape=pos), color="black") +
   theme_bw() +theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
 ```
+
+```{r }
+
+
+ggplot(classified_filtered_celltype_and_FOXA2_prop_ave, aes(x=mean_propFOXA2, y=mean_propDP)) +
+  geom_linerange(aes(xmin = mean_propFOXA2-sd_propFOXA2,xmax = mean_propFOXA2+sd_propFOXA2), color="#cecece") + 
+  geom_linerange(aes(ymin = mean_propDP+sd_propDP,ymax = mean_propDP-sd_propDP), color="#cecece") + 
+  geom_point(aes(fill=embryorealID), color="black", shape=21) +
+  ylab("Proportion of DP+ cells per section") +
+  xlab("Proportion of FOXA2+ cells per section") +
+  theme_bw(base_size = 12)
+
+ggplot(classified_filtered_celltype_and_FOXA2_prop_ave, aes(x=mean_propFOXA2, y=mean_propDP)) +
+  geom_linerange(aes(xmin = mean_propFOXA2-sd_propFOXA2,xmax = mean_propFOXA2+sd_propFOXA2), color="#cecece") + 
+  geom_linerange(aes(ymin = mean_propDP+sd_propDP,ymax = mean_propDP-sd_propDP), color="#cecece") + 
+  geom_point(aes(fill=mean_NTcell), color="black", shape=21) +
+  scale_fill_viridis_c(direction=-1) +
+  ylab("Proportion of DP+ cells per section") +
+  xlab("Proportion of FOXA2+ cells per section") +
+  theme_bw(base_size = 12)
+
+
+```
+
+
 
 
 ```{r}

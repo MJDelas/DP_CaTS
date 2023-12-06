@@ -73,7 +73,7 @@ ggplot(segment_cp_clean, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   geom_point(size=0.1, aes(color=Intensity_MeanIntensity_FOXA2_Image))+
   scale_color_gradient2(low = "grey", mid = "white", high = "brown") +
   facet_wrap( ~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL) +
   theme_bw()
 ```
 
@@ -85,7 +85,7 @@ ggplot(segment_cp_clean, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   geom_point(size=0.1, aes(color=Intensity_MeanIntensity_SOX2_Image))+
   scale_color_gradient2(low = "grey", mid = "white", high = "brown") +
   facet_wrap( ~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 ```
 
@@ -97,7 +97,7 @@ ggplot(segment_cp_clean, aes(x=Location_Center_X,y=-Location_Center_Y)) +
 sox2_thres = 0.25
 nkx22_thress = 0.35
 olig2_thress = 0.2
-foxa2_thress = 0.15
+foxa2_thress = 0.3
 
 ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_SOX2_Image, y=Intensity_MeanIntensity_OLIG2_Image)) +
   geom_hex(binwidth = c(0.04, 0.04))  +
@@ -106,7 +106,7 @@ ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_SOX2_Image, y=Intensity_M
   scale_x_log10()+
   scale_y_log10() +
   facet_wrap(~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 ```
 
@@ -120,7 +120,7 @@ ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_SOX2_Image, y=Intensity_M
   scale_x_log10()+
   scale_y_log10() +
   facet_wrap(~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 ```
 
@@ -134,7 +134,7 @@ ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_OLIG2_Image, y=Intensity_
   scale_x_log10()+
   scale_y_log10() +
   facet_wrap(~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 ```
 
@@ -148,11 +148,26 @@ ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_FOXA2_Image, y=Intensity_
   scale_x_log10()+
   scale_y_log10() +
   facet_wrap(~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 ```
 
 ![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-6-4.png)<!-- -->
+
+``` r
+ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_FOXA2_Image, y=Intensity_MeanIntensity_NKX22_Image)) +
+  geom_point(size=0.2, aes(color=Intensity_MeanIntensity_FOXA2_Image)) +
+  scale_color_gradient2(low = "grey", mid = "white", high = "brown") +
+  geom_vline(xintercept=foxa2_thress,  linetype="dashed", color = "blue") +
+  geom_hline(yintercept=nkx22_thress,  linetype="dashed", color = "blue") +
+  scale_x_log10()+
+  scale_y_log10() +
+  facet_wrap(~ embryoID) +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  theme_bw()
+```
+
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_OLIG2_Image, y=Intensity_MeanIntensity_NKX22_Image)) +
@@ -163,11 +178,41 @@ ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_OLIG2_Image, y=Intensity_
   scale_x_log10()+
   scale_y_log10() +
   facet_wrap(~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 ```
 
-![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-6-5.png)<!-- -->
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+
+``` r
+ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_SOX2_Image, y=Intensity_MeanIntensity_NKX22_Image)) +
+  geom_point(size=0.2, aes(color=Intensity_MeanIntensity_FOXA2_Image)) +
+  scale_color_gradient2(low = "grey", mid = "white", high = "brown") +
+  geom_vline(xintercept=sox2_thres,  linetype="dashed", color = "blue") +
+  geom_hline(yintercept=nkx22_thress,  linetype="dashed", color = "blue") +
+  scale_x_log10()+
+  scale_y_log10() +
+  facet_wrap(~ embryoID) +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  theme_bw()
+```
+
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-7-3.png)<!-- -->
+
+``` r
+ggplot(segment_cp_clean, aes(x=Intensity_MeanIntensity_FOXA2_Image, y=Intensity_MeanIntensity_SOX2_Image)) +
+  geom_point(size=0.2, aes(color=Intensity_MeanIntensity_FOXA2_Image)) +
+  scale_color_gradient2(low = "grey", mid = "white", high = "brown") +
+  geom_vline(xintercept=foxa2_thress,  linetype="dashed", color = "blue") +
+  geom_hline(yintercept=sox2_thres,  linetype="dashed", color = "blue") +
+  # scale_x_log10()+
+  # scale_y_log10() +
+  facet_wrap(~ embryoID) +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  theme_bw()
+```
+
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-7-4.png)<!-- -->
 
 ### Steps
 
@@ -182,7 +227,7 @@ Classification based on Intensity_MeanIntensity_ANTIBODY_Image and the
 thresholds above.
 
 sox2_thres = 0.25 nkx22_thress = 0.35 olig2_thress = 0.2 foxa2_thress =
-0.15
+0.3
 
 ``` r
 full_classified <- segment_cp_clean %>%
@@ -196,27 +241,27 @@ ggplot(full_classified, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   #geom_point(size=0.01) +
   geom_point(size=0.1, aes(color=celltype))+
   facet_wrap( ~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 ```
 
-![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 ggplot(full_classified, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   #geom_point(size=0.01) +
   geom_point(size=0.1, aes(color=foxa2_positive))+
   facet_wrap( ~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 ```
 
-![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-7-2.png)<!-- -->
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->
 
-#### Filter background Nkx22 cells based on position
+#### Filter background SOX2+ FOXA2+ cells based on position
 
 Cell that are positioned more than 5 standard deviations away from the
-mean (dashed red line) of the pMN population will be excluded. Visualize
+mean of the pMN population (dashed red line) will be excluded. Visualize
 the excluded cells below.
 
 ``` r
@@ -244,11 +289,11 @@ ggplot(full_classified, aes(x=Location_Center_X, y=-Location_Center_Y)) +
   expand_limits(y=c(0,-1024),x=c(0,1024)) +
   geom_hline(data=full_classified_mean_pmnposition, aes(yintercept=-(ave_y+5*sd_y)),linetype='dashed', col = 'red') +
   facet_wrap(~ embryoID) +
-  coord_fixed(ratio = 1) +
+  # coord_fixed(ratio = 1) +
   theme_bw(base_size = 8)
 ```
 
-![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 Identify y pos of cells to be filtered
 
@@ -270,51 +315,27 @@ classified_filtered <- full_classified %>%
 ggplot(classified_filtered, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   geom_point(size=0.1, aes(color=celltype))+
   facet_wrap( ~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 ```
 
-![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
 ``` r
 ggplot(classified_filtered, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   geom_point(size=0.1, aes(color=foxa2_positive))+
   facet_wrap( ~ embryoID) +
-  coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+  # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
   theme_bw()
 ```
 
-![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
 
 ## the plot
 
 ``` r
-classified_filtered
-```
+# classified_filtered
 
-    ## # A tibble: 11,049 × 12
-    ## # Groups:   ImageNumber, embryoID [33]
-    ##    ImageNumber embryoID        Intensity_MeanIntensity_…¹ Intensity_MeanIntens…²
-    ##          <int> <chr>                                <dbl>                  <dbl>
-    ##  1           1 8.1aA_Pos1_Emb2                      0.610                 0.0833
-    ##  2           1 8.1aA_Pos1_Emb2                      0.539                 0.103 
-    ##  3           1 8.1aA_Pos1_Emb2                      0.557                 0.114 
-    ##  4           1 8.1aA_Pos1_Emb2                      0.641                 0.121 
-    ##  5           1 8.1aA_Pos1_Emb2                      0.703                 0.102 
-    ##  6           1 8.1aA_Pos1_Emb2                      0.382                 0.0857
-    ##  7           1 8.1aA_Pos1_Emb2                      0.543                 0.113 
-    ##  8           1 8.1aA_Pos1_Emb2                      0.740                 0.117 
-    ##  9           1 8.1aA_Pos1_Emb2                      0.414                 0.0576
-    ## 10           1 8.1aA_Pos1_Emb2                      0.544                 0.109 
-    ## # ℹ 11,039 more rows
-    ## # ℹ abbreviated names: ¹​Intensity_MeanIntensity_DAPI_Image,
-    ## #   ²​Intensity_MeanIntensity_FOXA2_Image
-    ## # ℹ 8 more variables: Intensity_MeanIntensity_NKX22_Image <dbl>,
-    ## #   Intensity_MeanIntensity_OLIG2_Image <dbl>,
-    ## #   Intensity_MeanIntensity_SOX2_Image <dbl>, Location_Center_X <dbl>,
-    ## #   Location_Center_Y <dbl>, celltype <chr>, foxa2_positive <chr>, …
-
-``` r
 classified_filtered_celltype_counts <- classified_filtered %>%
   mutate(celltype = factor(celltype, levels = c("DP","p3","pMN","Sox2_notp3","othercell"))) %>%
   # mutate(foxa2_positive = factor(foxa2_positive, levels = c("Foxa2","notFoxa2"))) %>%
@@ -348,7 +369,7 @@ ggplot(classified_filtered_celltype_and_FOXA2, aes(x=Foxa2, y=DP)) +
   theme_bw(base_size = 12)
 ```
 
-![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 Is it just bigger embryos have more cells?
 
@@ -361,7 +382,7 @@ ggplot(classified_filtered_celltype_and_FOXA2, aes(x=Foxa2, y=p3)) +
   theme_bw(base_size = 12)
 ```
 
-![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 Proportions instead?
 
@@ -383,7 +404,7 @@ ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=prop_FOXA2, y=prop_DP)
   theme_bw(base_size = 12)
 ```
 
-![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 ``` r
 ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=prop_FOXA2, y=prop_DP)) +
@@ -396,7 +417,7 @@ ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=prop_FOXA2, y=prop_DP)
   theme_bw(base_size = 12)
 ```
 
-![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 ``` r
 ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=Foxa2, y=DP)) +
@@ -408,7 +429,7 @@ ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=Foxa2, y=DP)) +
   theme_bw(base_size = 12)
 ```
 
-![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
 
 ``` r
 classified_filtered_celltype_and_FOXA2_prop_ave <- classified_filtered_celltype_and_FOXA2_prop %>%
@@ -416,25 +437,66 @@ classified_filtered_celltype_and_FOXA2_prop_ave <- classified_filtered_celltype_
   summarise(mean_propDP=mean(prop_DP),
          sd_propDP=sd(prop_DP),
          sd_propFOXA2=sd(prop_FOXA2),
-         mean_propFOXA2=mean(prop_FOXA2))
+         mean_propFOXA2=mean(prop_FOXA2),
+         mean_NTcell=mean(NTcells))
 
 
 ggplot(classified_filtered_celltype_and_FOXA2_prop_ave, aes(x=embryorealID, y=mean_propDP)) +
   geom_col(aes(fill=embryorealID)) +
-  geom_point(data = classified_filtered_celltype_and_FOXA2_prop, aes(x=embryorealID, y=prop_DP, fill=embryorealID), color="black", shape=21) +
+  geom_point(data = classified_filtered_celltype_and_FOXA2_prop, aes(x=embryorealID, y=prop_DP, fill=embryorealID,shape=pos), color="black") +
   theme_bw() +theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
-![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
 ggplot(classified_filtered_celltype_and_FOXA2_prop_ave, aes(x=embryorealID, y=mean_propFOXA2)) +
   geom_col(aes(fill=embryorealID)) +
-  geom_point(data = classified_filtered_celltype_and_FOXA2_prop, aes(x=embryorealID, y=prop_FOXA2, fill=embryorealID), color="black", shape=21) +
+  geom_point(data = classified_filtered_celltype_and_FOXA2_prop, aes(x=embryorealID, y=prop_FOXA2, fill=embryorealID,shape=pos), color="black") +
   theme_bw() +theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
-![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-18-2.png)<!-- -->
+
+``` r
+ggplot(classified_filtered_celltype_and_FOXA2_prop_ave, aes(x=embryorealID, y=mean_NTcell)) +
+  geom_col(aes(fill=embryorealID)) +
+  geom_point(data = classified_filtered_celltype_and_FOXA2_prop, aes(x=embryorealID, y=NTcells, fill=embryorealID,shape=pos), color="black") +
+  theme_bw() +theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-18-3.png)<!-- -->
+
+``` r
+ggplot(classified_filtered_celltype_and_FOXA2_prop_ave, aes(x=mean_propFOXA2, y=mean_propDP)) +
+  geom_linerange(aes(xmin = mean_propFOXA2-sd_propFOXA2,xmax = mean_propFOXA2+sd_propFOXA2), color="#cecece") + 
+  geom_linerange(aes(ymin = mean_propDP+sd_propDP,ymax = mean_propDP-sd_propDP), color="#cecece") + 
+  geom_point(aes(fill=embryorealID), color="black", shape=21) +
+  ylab("Proportion of DP+ cells per section") +
+  xlab("Proportion of FOXA2+ cells per section") +
+  theme_bw(base_size = 12)
+```
+
+    ## Warning: Removed 15 rows containing missing values (`geom_segment()`).
+    ## Removed 15 rows containing missing values (`geom_segment()`).
+
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+
+``` r
+ggplot(classified_filtered_celltype_and_FOXA2_prop_ave, aes(x=mean_propFOXA2, y=mean_propDP)) +
+  geom_linerange(aes(xmin = mean_propFOXA2-sd_propFOXA2,xmax = mean_propFOXA2+sd_propFOXA2), color="#cecece") + 
+  geom_linerange(aes(ymin = mean_propDP+sd_propDP,ymax = mean_propDP-sd_propDP), color="#cecece") + 
+  geom_point(aes(fill=mean_NTcell), color="black", shape=21) +
+  scale_fill_viridis_c(direction=-1) +
+  ylab("Proportion of DP+ cells per section") +
+  xlab("Proportion of FOXA2+ cells per section") +
+  theme_bw(base_size = 12)
+```
+
+    ## Warning: Removed 15 rows containing missing values (`geom_segment()`).
+    ## Removed 15 rows containing missing values (`geom_segment()`).
+
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
 
 ``` r
 sessionInfo()
