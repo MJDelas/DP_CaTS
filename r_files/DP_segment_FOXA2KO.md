@@ -239,10 +239,11 @@ full_classified <- segment_cp_clean %>%
 
 ggplot(full_classified, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   #geom_point(size=0.01) +
-  geom_point(size=0.1, aes(color=celltype))+
+  geom_point(size=0.05, aes(color=celltype))+
   facet_wrap( ~ embryoID) +
   # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
-  theme_bw()
+  theme_bw() +theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  panel.background = element_blank(), axis.line = element_line(colour = "black"))
 ```
 
 ![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
@@ -250,13 +251,32 @@ ggplot(full_classified, aes(x=Location_Center_X,y=-Location_Center_Y)) +
 ``` r
 ggplot(full_classified, aes(x=Location_Center_X,y=-Location_Center_Y)) +
   #geom_point(size=0.01) +
-  geom_point(size=0.1, aes(color=foxa2_positive))+
+  geom_point(size=0.05, aes(color=foxa2_positive))+
   facet_wrap( ~ embryoID) +
   # coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
-  theme_bw()
+  theme_bw()+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+  panel.background = element_blank(), axis.line = element_line(colour = "black"))
 ```
 
 ![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->
+
+``` r
+# ggplot(full_classified, aes(x=Location_Center_X,y=-Location_Center_Y)) +
+#   #geom_point(size=0.01) +
+#   geom_point(size = 0.3, stroke = 0, aes(color=celltype))+
+#   facet_wrap( ~ embryoID) +
+#   coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+#   theme_bw(base_size = 10) +theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+#   panel.background = element_blank(), axis.line = element_line(colour = "black"))
+# 
+# ggplot(full_classified, aes(x=Location_Center_X,y=-Location_Center_Y)) +
+#   #geom_point(size=0.01) +
+#   geom_point(size = 0.3, stroke = 0, aes(color=foxa2_positive))+
+#   facet_wrap( ~ embryoID) +
+#   coord_fixed(ratio = 1, xlim = NULL, ylim = NULL, expand = TRUE, clip = "on") +
+#   theme_bw(base_size = 10)+theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+#   panel.background = element_blank(), axis.line = element_line(colour = "black"))
+```
 
 #### Filter background SOX2+ FOXA2+ cells based on position
 
@@ -566,7 +586,7 @@ ggplot(classified_filtered_celltype_and_FOXA2_prop_ave, aes(x=mean_propFOXA2, y=
 
 # 4 bins of equal length
 
-classified_filtered_celltype_and_FOXA2_prop$NTdiscrete <- cut_interval(classified_filtered_celltype_and_FOXA2_prop$NTcells, 4)
+classified_filtered_celltype_and_FOXA2_prop$NTdiscrete <- cut_interval(classified_filtered_celltype_and_FOXA2_prop$NTcells, 5)
 
 ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=Foxa2, y=DP)) +
   # geom_linerange(aes(xmin = mean_propFOXA2-sd_propFOXA2,xmax = mean_propFOXA2+sd_propFOXA2), color="#cecece") + 
@@ -579,6 +599,36 @@ ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=Foxa2, y=DP)) +
 ```
 
 ![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-21-1.png)<!-- -->
+
+``` r
+ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=Foxa2, y=DP)) +
+  # geom_linerange(aes(xmin = mean_propFOXA2-sd_propFOXA2,xmax = mean_propFOXA2+sd_propFOXA2), color="#cecece") + 
+  # geom_linerange(aes(ymin = mean_propDP+sd_propDP,ymax = mean_propDP-sd_propDP), color="#cecece") + 
+  geom_point(aes(fill=block, shape=emb)) +
+  scale_shape_manual(values = shapes5_manual) +
+  scale_fill_brewer(palette = "Set1") +
+  ylab("Number of DP+ cells per section") +
+  xlab("Number of FOXA2+ cells per section") +
+  facet_wrap(~ NTdiscrete, nrow = 1) +
+  theme_bw(base_size = 12)
+```
+
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-21-2.png)<!-- -->
+
+``` r
+ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=Foxa2, y=DP)) +
+  # geom_linerange(aes(xmin = mean_propFOXA2-sd_propFOXA2,xmax = mean_propFOXA2+sd_propFOXA2), color="#cecece") + 
+  # geom_linerange(aes(ymin = mean_propDP+sd_propDP,ymax = mean_propDP-sd_propDP), color="#cecece") + 
+  geom_point(aes(color=block, shape=emb)) +
+  scale_shape_manual(values = shapes5_manual) +
+  scale_color_brewer(palette = "Set1") +
+  ylab("Number of DP+ cells per section") +
+  xlab("Number of FOXA2+ cells per section") +
+  facet_wrap(~ NTdiscrete, nrow = 1) +
+  theme_bw(base_size = 12)
+```
+
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-21-3.png)<!-- -->
 
 ``` r
 sessionInfo()
