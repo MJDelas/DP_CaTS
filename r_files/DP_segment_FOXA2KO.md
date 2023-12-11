@@ -606,7 +606,7 @@ ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=Foxa2, y=DP)) +
   # geom_linerange(aes(ymin = mean_propDP+sd_propDP,ymax = mean_propDP-sd_propDP), color="#cecece") + 
   geom_point(aes(fill=block, shape=emb)) +
   scale_shape_manual(values = shapes5_manual) +
-  scale_fill_brewer(palette = "Set1") +
+  scale_fill_brewer(palette = "Set2") +
   ylab("Number of DP+ cells per section") +
   xlab("Number of FOXA2+ cells per section") +
   facet_wrap(~ NTdiscrete, nrow = 1) +
@@ -621,7 +621,7 @@ ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=Foxa2, y=DP)) +
   # geom_linerange(aes(ymin = mean_propDP+sd_propDP,ymax = mean_propDP-sd_propDP), color="#cecece") + 
   geom_point(aes(color=block, shape=emb)) +
   scale_shape_manual(values = shapes5_manual) +
-  scale_color_brewer(palette = "Set1") +
+  scale_color_brewer(palette = "Set2") +
   ylab("Number of DP+ cells per section") +
   xlab("Number of FOXA2+ cells per section") +
   facet_wrap(~ NTdiscrete, nrow = 1) +
@@ -629,6 +629,21 @@ ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=Foxa2, y=DP)) +
 ```
 
 ![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-21-3.png)<!-- -->
+
+``` r
+ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=Foxa2, y=DP)) +
+  # geom_linerange(aes(xmin = mean_propFOXA2-sd_propFOXA2,xmax = mean_propFOXA2+sd_propFOXA2), color="#cecece") + 
+  # geom_linerange(aes(ymin = mean_propDP+sd_propDP,ymax = mean_propDP-sd_propDP), color="#cecece") + 
+  geom_point(aes(fill=block, shape=pos)) +
+  scale_shape_manual(values = shapes5_manual) +
+  scale_fill_brewer(palette = "Set2") +
+  ylab("Number of DP+ cells per section") +
+  xlab("Number of FOXA2+ cells per section") +
+  facet_wrap(~ NTdiscrete, nrow = 1) +
+  theme_bw(base_size = 12)
+```
+
+![](DP_segment_FOXA2KO_files/figure-gfm/unnamed-chunk-21-4.png)<!-- -->
 
 ``` r
 sessionInfo()
