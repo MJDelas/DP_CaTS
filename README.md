@@ -13,3 +13,7 @@ Analysis of CaTs-ATAC/RNA
 
 2. BARRY
     - [First pass](r_files/BARRY_1.md) 
+
+3. cKO Segmentation
+    - [First exploration](r_files/DP_segment_FOXA2KO.md)
+    - [troubleshooting genotypes ](r_files/DP_segment_FOXA2KO_withgenotypes.md)
