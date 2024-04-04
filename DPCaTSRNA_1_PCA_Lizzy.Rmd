@@ -485,7 +485,7 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(g
 
 ```{r }
 
-geneOI_2 <- c("Nkx2-9")
+geneOI_2 <- c("Rara","Rxra","Rarb","Rarg")
 
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI_2) %>% mutate(geneid=factor(geneid, levels=geneOI_2)), 
        aes(x=Gate,y=counts_norm)) +
@@ -499,9 +499,53 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI_2) %>% mutate(geneid=factor
   facet_grid(geneid ~ Day, scales = "free_y") +
   theme_bw()
 
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI_2) %>% mutate(geneid=factor(geneid, levels=geneOI_2)), 
+       aes(x=Day,y=counts_norm)) +
+  stat_summary(aes(fill=Gate),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=color_gates) +
+  scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
 ```
 
+
 # Analysis without neurons
+
+```{r }
+geneOI_3 <- c("Nkx2-9")
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI_3) %>% mutate(geneid=factor(geneid, levels=geneOI_3)), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Condition),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Condition), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=colors_conditions) +
+  scale_color_manual(values=colors_conditions) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Day, scales = "free_y") +
+  theme_bw()
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI_3) %>% mutate(geneid=factor(geneid, levels=geneOI_3)), 
+       aes(x=Day,y=counts_norm)) +
+  stat_summary(aes(fill=Gate),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=color_gates) +
+  scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
+
+```
 
 ```{r }
 gates=c("_pMN_","_p3_","_DP_")
