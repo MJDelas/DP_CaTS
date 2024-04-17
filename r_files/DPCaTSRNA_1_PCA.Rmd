@@ -162,6 +162,14 @@ vsd_data <- assay(vsd)
 
 ```
 
+Removing Outliers
+
+#```{r}
+
+vsd_data <- subset(vsd_data_unfiltered, select = -D6_UPSAG_pMN_R2)
+
+```
+
 ## Plot PCAs 
 
 ```{r }
