@@ -448,7 +448,7 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(g
 ```
 ```{r fig.height=9, fig.width=9}
 
-geneOI_2 <- c("Nkx2-9")
+geneOI_2 <- c("Rarb","Rara","Rarg","Capn6","Nrarp","Pard6g","Mrpl41","Smu1","Cyp26a1","Cyp26b1","Cyp26c1")
 
 
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI_2) %>% mutate(geneid=factor(geneid, levels=geneOI_2)), 
