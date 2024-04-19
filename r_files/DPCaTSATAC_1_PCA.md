@@ -111,9 +111,6 @@ colors_conditions <- c("#e67300","#4d9a00","#cdcd00","#0073e6")
 
 ## Differential analysis
 
-This normalization includes ERCC. I use it later samples don’t cluster
-in any special way just with ERCC correlations.
-
 ``` r
 count.matrix <- count.table %>%
   column_to_rownames("Geneid")
@@ -294,8 +291,8 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayCondition,shape=Gate)) +
 ![](DPCaTSATAC_1_PCA_files/figure-gfm/unnamed-chunk-9-6.png)<!-- -->
 
 ``` r
-ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
-  scale_fill_manual(values = color_gates) +
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Rep,shape=Gate)) +
+  #scale_fill_manual(values = color_gates) +
   geom_point(size=4, alpha=0.9) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes4_fill_manual) +
@@ -307,8 +304,12 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
 ![](DPCaTSATAC_1_PCA_files/figure-gfm/unnamed-chunk-9-7.png)<!-- -->
 
 ``` r
+colorIZ <- c("#abdff4","#f1df9a","#f19aac",
+             "#55bee8","#e6c444","#e64466",
+            "#1a91c1","#c19e1a","#c11a3d",
+            "#0e506b","#6b570e","#7c1127")
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Experiment,shape=Gate)) +
-  #scale_fill_manual(values = color_gates) +
+  scale_fill_manual(values = colorIZ) +
   geom_point(size=4, alpha=0.9) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes4_fill_manual) +
@@ -318,6 +319,19 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Experiment,shape=Gate)) +
 ```
 
 ![](DPCaTSATAC_1_PCA_files/figure-gfm/unnamed-chunk-9-8.png)<!-- -->
+
+``` r
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Experiment,shape=Day)) +
+  scale_fill_manual(values = colorIZ) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes4_fill_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme_bw(base_size=16)
+```
+
+![](DPCaTSATAC_1_PCA_files/figure-gfm/unnamed-chunk-9-9.png)<!-- -->
 
 ## Plot more components
 
@@ -334,21 +348,21 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
 ![](DPCaTSATAC_1_PCA_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
-ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
-  scale_fill_manual(values = color_gates) +
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Experiment,shape=Gate)) +
+  scale_fill_manual(values = colorIZ) +
   geom_point(size=4, alpha=0.9) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
-  scale_shape_manual(values = shapes5_manual) +
+  scale_shape_manual(values = shapes4_fill_manual) +
   labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
-       y=paste0("PC3: ",round(var_explained[3]*100,1),"%")) +
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
   theme_bw(base_size=16)
 ```
 
 ![](DPCaTSATAC_1_PCA_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
 
 ``` r
-ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
-  scale_fill_manual(values = colors_greys) +
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Experiment,shape=Gate)) +
+  scale_fill_manual(values = colorIZ) +
   geom_point(size=4, alpha=0.9) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes5_manual) +
@@ -360,8 +374,17 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
 ![](DPCaTSATAC_1_PCA_files/figure-gfm/unnamed-chunk-10-3.png)<!-- -->
 
 ``` r
-ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
-  scale_fill_manual(values = color_gates) +
+# ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
+#   scale_fill_manual(values = colors_greys) +
+#   geom_point(size=4, alpha=0.9) +
+#   guides(fill = guide_legend(override.aes=list(shape=21))) +
+#   scale_shape_manual(values = shapes5_manual) +
+#   labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+#        y=paste0("PC3: ",round(var_explained[3]*100,1),"%")) +
+#   theme_bw(base_size=16)
+
+ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Experiment,shape=Gate)) +
+  scale_fill_manual(values = colorIZ) +
   geom_point(size=4, alpha=0.9) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes5_manual) +
@@ -373,9 +396,10 @@ ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
 ![](DPCaTSATAC_1_PCA_files/figure-gfm/unnamed-chunk-10-4.png)<!-- -->
 
 ``` r
-ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Experiment,shape=Gate, label=Rep)) +
+  scale_fill_manual(values = colorIZ) +
   geom_point(size=4, alpha=0.9) +
-  geom_text(nudge_x = 5) +
+  geom_text(nudge_x = 15) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes4_fill_manual) +
   labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
@@ -386,8 +410,8 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
 ![](DPCaTSATAC_1_PCA_files/figure-gfm/unnamed-chunk-10-5.png)<!-- -->
 
 ``` r
-ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
-  #scale_fill_manual(values = colorIZ) +
+ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Gate,shape=Day)) +
+  scale_fill_manual(values = color_gates) +
   geom_point(size=4, alpha=0.9) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes5_manual) +
@@ -399,9 +423,9 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
 ![](DPCaTSATAC_1_PCA_files/figure-gfm/unnamed-chunk-10-6.png)<!-- -->
 
 ``` r
-ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) +
+ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=Condition,shape=Day)) +
+  #scale_fill_manual(values = color_gates) +
   geom_point(size=4, alpha=0.9) +
-  geom_text(nudge_x = 5) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes4_fill_manual) +
   labs(x=paste0("PC4: ",round(var_explained[4]*100,1),"%"),

@@ -132,7 +132,6 @@ colors_conditions <- c("#e67300","#4d9a00","#cdcd00","#0073e6")
 
 ## Differential analysis
 
-This normalization includes ERCC. I use it later samples don't cluster in any special way just with ERCC correlations. 
 
 ```{r}
 
@@ -263,8 +262,8 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayCondition,shape=Gate)) +
        y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
   theme_bw(base_size=16)
 
-ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
-  scale_fill_manual(values = color_gates) +
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Rep,shape=Gate)) +
+  #scale_fill_manual(values = color_gates) +
   geom_point(size=4, alpha=0.9) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes4_fill_manual) +
@@ -272,8 +271,21 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
        y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
   theme_bw(base_size=16)
 
+colorIZ <- c("#abdff4","#f1df9a","#f19aac",
+             "#55bee8","#e6c444","#e64466",
+            "#1a91c1","#c19e1a","#c11a3d",
+            "#0e506b","#6b570e","#7c1127")
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Experiment,shape=Gate)) +
-  #scale_fill_manual(values = color_gates) +
+  scale_fill_manual(values = colorIZ) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes4_fill_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme_bw(base_size=16)
+
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Experiment,shape=Day)) +
+  scale_fill_manual(values = colorIZ) +
   geom_point(size=4, alpha=0.9) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes4_fill_manual) +
@@ -297,8 +309,17 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
        y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
   theme_bw(base_size=16)
 
-ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
-  scale_fill_manual(values = color_gates) +
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Experiment,shape=Gate)) +
+  scale_fill_manual(values = colorIZ) +
+  geom_point(size=4, alpha=0.9) +
+  guides(fill = guide_legend(override.aes=list(shape=21))) +
+  scale_shape_manual(values = shapes4_fill_manual) +
+  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+       y=paste0("PC2: ",round(var_explained[2]*100,1),"%")) +
+  theme_bw(base_size=16)
+
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Experiment,shape=Gate)) +
+  scale_fill_manual(values = colorIZ) +
   geom_point(size=4, alpha=0.9) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes5_manual) +
@@ -306,17 +327,17 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
        y=paste0("PC3: ",round(var_explained[3]*100,1),"%")) +
   theme_bw(base_size=16)
 
-ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
-  scale_fill_manual(values = colors_greys) +
-  geom_point(size=4, alpha=0.9) +
-  guides(fill = guide_legend(override.aes=list(shape=21))) +
-  scale_shape_manual(values = shapes5_manual) +
-  labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
-       y=paste0("PC3: ",round(var_explained[3]*100,1),"%")) +
-  theme_bw(base_size=16)
+# ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
+#   scale_fill_manual(values = colors_greys) +
+#   geom_point(size=4, alpha=0.9) +
+#   guides(fill = guide_legend(override.aes=list(shape=21))) +
+#   scale_shape_manual(values = shapes5_manual) +
+#   labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
+#        y=paste0("PC3: ",round(var_explained[3]*100,1),"%")) +
+#   theme_bw(base_size=16)
 
-ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
-  scale_fill_manual(values = color_gates) +
+ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Experiment,shape=Gate)) +
+  scale_fill_manual(values = colorIZ) +
   geom_point(size=4, alpha=0.9) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes5_manual) +
@@ -325,9 +346,10 @@ ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 
 
-ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
+ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Experiment,shape=Gate, label=Rep)) +
+  scale_fill_manual(values = colorIZ) +
   geom_point(size=4, alpha=0.9) +
-  geom_text(nudge_x = 5) +
+  geom_text(nudge_x = 15) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes4_fill_manual) +
   labs(x=paste0("PC1: ",round(var_explained[1]*100,1),"%"),
@@ -335,8 +357,8 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
   theme_bw(base_size=16)
 
 
-ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
-  #scale_fill_manual(values = colorIZ) +
+ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Gate,shape=Day)) +
+  scale_fill_manual(values = color_gates) +
   geom_point(size=4, alpha=0.9) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes5_manual) +
@@ -345,9 +367,9 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
   theme_bw(base_size=16)
 
 
-ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) +
+ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=Condition,shape=Day)) +
+  #scale_fill_manual(values = color_gates) +
   geom_point(size=4, alpha=0.9) +
-  geom_text(nudge_x = 5) +
   guides(fill = guide_legend(override.aes=list(shape=21))) +
   scale_shape_manual(values = shapes4_fill_manual) +
   labs(x=paste0("PC4: ",round(var_explained[4]*100,1),"%"),
@@ -360,7 +382,7 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
 
 
 # Correlation Heatmaps - all elements
-```{r fig.width=11,fig.height=11}
+```{r fig.width=13,fig.height=13}
 
 cor_vsd <-cor(vsd_data)
 
