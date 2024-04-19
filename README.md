@@ -5,7 +5,8 @@ Analysis of CaTs-ATAC/RNA
 1. CaTS-RNA
     - [PCAs and QC](r_files/DPCaTSRNA_1_PCA.md)
 
-
+2. CaTS-ATAC
+    -[PCAs and QC](r_files/)
 
 2. BARRY
     - [First pass](r_files/BARRY_1.md) 
