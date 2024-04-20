@@ -8,7 +8,7 @@ Analysis of CaTs-ATAC/RNA
     - [Explore diff exp](r_files/DPCaTSRNA_4_diffexpression_import.md)
 
 2. CaTS-ATAC
-    -[PCAs and QC](r_files/DPCaTSATAC_1_PCA.md)
+    - [PCAs and QC](r_files/DPCaTSATAC_1_PCA.md)
 
 2. BARRY
     - [First pass](r_files/BARRY_1.md) 
