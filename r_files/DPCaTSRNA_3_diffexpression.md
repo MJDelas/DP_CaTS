@@ -129,9 +129,6 @@ colors_conditions <- c("#e67300","#4d9a00","#cdcd00","#0073e6")
 
 ## Differential analysis between domains for a given timepoint and condition
 
-The lapply is not running yet because I need to filter the comparisons
-with enough samples.
-
 Targeted diff analysis in subsets of samples: - for each timepoint: diff
 expression between domains
 
@@ -179,7 +176,7 @@ PairWiseDEseq <-  lapply(c(1:length(treatment)),function (i) {
         
       ## if_else statement because many comparisons do not have enough samples
         
-        if(ncol(sub_counts)==4){
+        if(ncol(sub_counts)>=4){
       
           ## Make metadata file for DESeq
           genecolData_sub <- data.frame(Sample = colnames(sub_counts))
@@ -255,13 +252,13 @@ PairWiseDEseq <-  lapply(c(1:length(treatment)),function (i) {
           ## Export files
           
           write.table(dds_sub_counts,
-          file = paste0(workingdir,outdir,suboutdir1,"CountsNormalized_",regime,timepoints,resultsNames(dds_sub)[2],".txt"),
+          file = paste0(workingdir,outdir,suboutdir1,"CountsNormalized_",regime,"_",timepoints,resultsNames(dds_sub)[2],".txt"),
               quote = FALSE, row.names = TRUE)
           write.csv(vsd_sub_data,
-              paste0(workingdir,outdir,suboutdir1,"VSData_",regime,timepoints,resultsNames(dds_sub)[2],".csv"),
+              paste0(workingdir,outdir,suboutdir1,"VSData_",regime,"_",timepoints,resultsNames(dds_sub)[2],".csv"),
               quote = FALSE)
           write.table(results_sub,
-              file = paste0(workingdir,outdir,suboutdir1,"Results_DESeq_",regime,timepoints,resultsNames(dds_sub)[2],".txt"),
+              file = paste0(workingdir,outdir,suboutdir1,"Results_DESeq_",regime,"_",timepoints,resultsNames(dds_sub)[2],".txt"),
               quote = FALSE, row.names = TRUE)
     
           results_return <- results_sub %>% as.data.frame() %>% rownames_to_column("Geneid")
@@ -307,7 +304,7 @@ PairWiseDEseq <- lapply(c(1:length(treatment)),function (i) {
         
          ## if_else statement because many comparisons do not have enough samples
         
-        if(ncol(sub_counts)==4){
+        if(ncol(sub_counts)>=4){
         
         ## Make metadata file for DESeq
         genecolData_sub <- data.frame(Sample = colnames(sub_counts))
@@ -433,7 +430,7 @@ PairWiseDEseq <-  lapply(c(1:length(timepoint)),function (i) {
           dplyr::select(contains(timepoints)  & contains(celltypes) & contains(conditions))
         
          ## if_else statement because many comparisons do not have enough samples
-        if(ncol(sub_counts)==4){
+        if(ncol(sub_counts)>=4){
           
         ## Make metadata file for DESeq
         genecolData_sub <- data.frame(Sample = colnames(sub_counts))
@@ -657,7 +654,7 @@ PairWiseDEseq <-
 Compare upsag d7 and 500 d6. Is anything different from 500 d7 vs d6?
 
 ``` r
-samples_wanted <- c("D7_UPSAG_p3","D6_500_p3")
+samples_wanted <- c("D7_UPSAG_p3","D5_500_p3")
         # timepoints <- timepoint[i]
         # celltypes <- allgates[x]
         # conditions <- comparisons[,y]
@@ -712,7 +709,7 @@ samples_wanted <- c("D7_UPSAG_p3","D6_500_p3")
             #ylim(-threshold,threshold) +
             scale_x_log10() +
             scale_color_manual(values = c("gray30","#d83a00","#ff9b76","#ffd4c4")) +
-            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange > 0),
+            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange > 2),
                     nudge_y = 20,
                     #nudge_x=-10,
                     #force_pull   = 10,
@@ -721,7 +718,7 @@ samples_wanted <- c("D7_UPSAG_p3","D6_500_p3")
                     box.padding = 0.5,
                     segment.color = "grey50",
                     direction     = "both") +
-            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange < 0),
+            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange < -2),
                     nudge_y = -20,
                     #nudge_x=-10,
                     #force_pull   = 10,
