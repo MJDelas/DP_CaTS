@@ -11,11 +11,6 @@ rm(list=ls())
 library(DESeq2)
 library(RColorBrewer)
 library(tidyverse)
-```
-
-    ## Warning: package 'stringr' was built under R version 4.2.3
-
-``` r
 library(ComplexHeatmap)
 ```
 
@@ -54,8 +49,8 @@ ann_table_clean <- ann_table %>%
   separate(Annotation, into = "Annotation_brief", sep = " ", remove = FALSE)
 ```
 
-    ## Warning: Expected 1 pieces. Additional pieces discarded in 67172 rows [1, 6, 8, 11, 13,
-    ## 15, 17, 18, 19, 22, 23, 25, 26, 30, 32, 33, 34, 36, 42, 46, ...].
+    ## Warning: Expected 1 pieces. Additional pieces discarded in 65829 rows [1, 2, 3, 4, 5, 9,
+    ## 14, 15, 16, 17, 18, 19, 20, 21, 22, 25, 26, 27, 28, 29, ...].
 
 genes named Geneid
 
@@ -150,7 +145,7 @@ dds <- DESeq(dds)
 
     ## fitting model and testing
 
-    ## -- replacing outliers and refitting for 2 genes
+    ## -- replacing outliers and refitting for 8 genes
     ## -- DESeq argument 'minReplicatesForReplace' = 7 
     ## -- original counts are preserved in counts(dds)
 
@@ -176,12 +171,6 @@ Removing Outliers
 ## to go it in the top ntop variable genes 
 # calculate the variance for each gene
 rv <- rowVars(vsd_data)
-```
-
-    ## Warning: useNames = NA is deprecated. Instead, specify either useNames = TRUE
-    ## or useNames = FALSE.
-
-``` r
 # select the ntop genes by variance
 ntop=30000
 select <- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
@@ -504,9 +493,6 @@ vsd_stats$ave_vsd = rowMeans(vsd_data)
 vsd_stats$row_var = rowVars(as.matrix(vsd_data))
 ```
 
-    ## Warning: useNames = NA is deprecated. Instead, specify either useNames = TRUE
-    ## or useNames = FALSE.
-
 ``` r
 ann_vsd_stat <- vsd_stats %>%
   rownames_to_column("Peakid") %>%
@@ -623,7 +609,7 @@ dds <- DESeq(dds)
 
     ## fitting model and testing
 
-    ## -- replacing outliers and refitting for 12 genes
+    ## -- replacing outliers and refitting for 19 genes
     ## -- DESeq argument 'minReplicatesForReplace' = 7 
     ## -- original counts are preserved in counts(dds)
 
@@ -647,12 +633,6 @@ vsd_data <- assay(vsd)
 ## to go it in the top ntop variable genes 
 # calculate the variance for each gene
 rv <- rowVars(vsd_data)
-```
-
-    ## Warning: useNames = NA is deprecated. Instead, specify either useNames = TRUE
-    ## or useNames = FALSE.
-
-``` r
 # select the ntop genes by variance
 ntop=30000
 select <- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
@@ -896,58 +876,57 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
 sessionInfo()
 ```
 
-    ## R version 4.2.2 (2022-10-31)
+    ## R version 4.3.3 (2024-02-29)
     ## Platform: aarch64-apple-darwin20 (64-bit)
-    ## Running under: macOS 14.4.1
+    ## Running under: macOS Sonoma 14.4.1
     ## 
     ## Matrix products: default
-    ## BLAS:   /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRblas.0.dylib
-    ## LAPACK: /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRlapack.dylib
+    ## BLAS:   /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRblas.0.dylib 
+    ## LAPACK: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
     ## 
     ## locale:
     ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+    ## 
+    ## time zone: Europe/London
+    ## tzcode source: internal
     ## 
     ## attached base packages:
     ## [1] grid      stats4    stats     graphics  grDevices utils     datasets 
     ## [8] methods   base     
     ## 
     ## other attached packages:
-    ##  [1] ComplexHeatmap_2.15.4       lubridate_1.9.3            
+    ##  [1] ComplexHeatmap_2.18.0       lubridate_1.9.3            
     ##  [3] forcats_1.0.0               stringr_1.5.1              
-    ##  [5] dplyr_1.1.3                 purrr_1.0.2                
-    ##  [7] readr_2.1.4                 tidyr_1.3.0                
-    ##  [9] tibble_3.2.1                ggplot2_3.4.4              
+    ##  [5] dplyr_1.1.4                 purrr_1.0.2                
+    ##  [7] readr_2.1.5                 tidyr_1.3.1                
+    ##  [9] tibble_3.2.1                ggplot2_3.5.0              
     ## [11] tidyverse_2.0.0             RColorBrewer_1.1-3         
-    ## [13] DESeq2_1.38.3               SummarizedExperiment_1.28.0
-    ## [15] Biobase_2.58.0              MatrixGenerics_1.10.0      
-    ## [17] matrixStats_1.1.0           GenomicRanges_1.50.2       
-    ## [19] GenomeInfoDb_1.34.9         IRanges_2.32.0             
-    ## [21] S4Vectors_0.36.2            BiocGenerics_0.44.0        
+    ## [13] DESeq2_1.42.1               SummarizedExperiment_1.32.0
+    ## [15] Biobase_2.62.0              MatrixGenerics_1.14.0      
+    ## [17] matrixStats_1.2.0           GenomicRanges_1.54.1       
+    ## [19] GenomeInfoDb_1.38.8         IRanges_2.36.0             
+    ## [21] S4Vectors_0.40.2            BiocGenerics_0.48.1        
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] bitops_1.0-7           bit64_4.0.5            doParallel_1.0.17     
-    ##  [4] httr_1.4.7             tools_4.2.2            utf8_1.2.4            
-    ##  [7] R6_2.5.1               DBI_1.1.3              colorspace_2.1-0      
-    ## [10] GetoptLong_1.0.5       withr_2.5.2            tidyselect_1.2.0      
-    ## [13] bit_4.0.5              compiler_4.2.2         cli_3.6.1             
-    ## [16] Cairo_1.6-1            DelayedArray_0.24.0    labeling_0.4.3        
-    ## [19] scales_1.2.1           digest_0.6.33          rmarkdown_2.25        
-    ## [22] XVector_0.38.0         pkgconfig_2.0.3        htmltools_0.5.7       
-    ## [25] highr_0.10             fastmap_1.1.1          rlang_1.1.2           
-    ## [28] GlobalOptions_0.1.2    rstudioapi_0.15.0      RSQLite_2.3.3         
-    ## [31] farver_2.1.1           shape_1.4.6            generics_0.1.3        
-    ## [34] BiocParallel_1.32.6    RCurl_1.98-1.13        magrittr_2.0.3        
-    ## [37] GenomeInfoDbData_1.2.9 Matrix_1.6-3           Rcpp_1.0.11           
-    ## [40] munsell_0.5.0          fansi_1.0.5            lifecycle_1.0.4       
-    ## [43] stringi_1.8.1          yaml_2.3.7             zlibbioc_1.44.0       
-    ## [46] blob_1.2.4             parallel_4.2.2         crayon_1.5.2          
-    ## [49] lattice_0.22-5         Biostrings_2.66.0      annotate_1.76.0       
-    ## [52] circlize_0.4.15        hms_1.1.3              KEGGREST_1.38.0       
-    ## [55] magick_2.8.1           locfit_1.5-9.8         knitr_1.45            
-    ## [58] pillar_1.9.0           rjson_0.2.21           geneplotter_1.76.0    
-    ## [61] codetools_0.2-19       XML_3.99-0.15          glue_1.6.2            
-    ## [64] evaluate_0.23          png_0.1-8              vctrs_0.6.4           
-    ## [67] tzdb_0.4.0             foreach_1.5.2          gtable_0.3.4          
-    ## [70] clue_0.3-65            cachem_1.0.8           xfun_0.43             
-    ## [73] xtable_1.8-4           iterators_1.0.14       AnnotationDbi_1.60.2  
-    ## [76] memoise_2.0.1          cluster_2.1.4          timechange_0.2.0
+    ##  [1] tidyselect_1.2.1        farver_2.1.1            bitops_1.0-7           
+    ##  [4] fastmap_1.1.1           RCurl_1.98-1.14         digest_0.6.35          
+    ##  [7] timechange_0.3.0        lifecycle_1.0.4         cluster_2.1.6          
+    ## [10] magrittr_2.0.3          compiler_4.3.3          rlang_1.1.3            
+    ## [13] tools_4.3.3             utf8_1.2.4              yaml_2.3.8             
+    ## [16] knitr_1.45              labeling_0.4.3          S4Arrays_1.2.1         
+    ## [19] DelayedArray_0.28.0     abind_1.4-5             BiocParallel_1.36.0    
+    ## [22] withr_3.0.0             fansi_1.0.6             colorspace_2.1-0       
+    ## [25] scales_1.3.0            iterators_1.0.14        cli_3.6.2              
+    ## [28] rmarkdown_2.26          crayon_1.5.2            generics_0.1.3         
+    ## [31] rstudioapi_0.16.0       tzdb_0.4.0              rjson_0.2.21           
+    ## [34] zlibbioc_1.48.2         parallel_4.3.3          XVector_0.42.0         
+    ## [37] vctrs_0.6.5             Matrix_1.6-5            hms_1.1.3              
+    ## [40] GetoptLong_1.0.5        clue_0.3-65             locfit_1.5-9.9         
+    ## [43] foreach_1.5.2           glue_1.7.0              codetools_0.2-20       
+    ## [46] stringi_1.8.3           gtable_0.3.4            shape_1.4.6.1          
+    ## [49] munsell_0.5.1           pillar_1.9.0            htmltools_0.5.8        
+    ## [52] GenomeInfoDbData_1.2.11 circlize_0.4.16         R6_2.5.1               
+    ## [55] doParallel_1.0.17       evaluate_0.23           lattice_0.22-6         
+    ## [58] highr_0.10              png_0.1-8               Rcpp_1.0.12            
+    ## [61] SparseArray_1.2.4       xfun_0.43               pkgconfig_2.0.3        
+    ## [64] GlobalOptions_0.1.2

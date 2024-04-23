@@ -158,17 +158,18 @@ vsd <- varianceStabilizingTransformation(dds,blind = FALSE)
 
 # Export normalized tables for plotting elsewhere
 dds_counts <- counts(dds, normalized = TRUE)
-vsd_data <- assay(vsd)
+vsd_data_unfiltered <- assay(vsd)
 
 ```
 
-Removing Outliers
 
-#```{r}
+Removing Outliers
+```{r}
 
 vsd_data <- subset(vsd_data_unfiltered, select = -D6_UPSAG_pMN_R2)
 
 ```
+
 
 ## Plot PCAs 
 
@@ -454,9 +455,9 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(g
   theme_bw()
 
 ```
-```{r fig.height=4, fig.width=5}
+```{r fig.height=8, fig.width=8}
 
-geneOI_2 <- c("Nkx2-9")
+geneOI_2 <- c("Nkx2-9","Nkx6-1","Foxa1","Phox2b","Neurog3","Uncx","Lhx1","Mnr2")
 
 
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI_2) %>% mutate(geneid=factor(geneid, levels=geneOI_2)), 
@@ -470,6 +471,7 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI_2) %>% mutate(geneid=factor
   scale_shape_manual(values=shapes4_fill_manual) +
   facet_grid(geneid ~ Day, scales = "free_y") +
   theme_bw()
+  
 ```
 
 # RA Response Genes

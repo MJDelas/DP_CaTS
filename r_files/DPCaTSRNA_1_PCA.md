@@ -191,7 +191,13 @@ vsd <- varianceStabilizingTransformation(dds,blind = FALSE)
 
 # Export normalized tables for plotting elsewhere
 dds_counts <- counts(dds, normalized = TRUE)
-vsd_data <- assay(vsd)
+vsd_data_unfiltered <- assay(vsd)
+```
+
+Removing Outliers
+
+``` r
+vsd_data <- subset(vsd_data_unfiltered, select = -D6_UPSAG_pMN_R2)
 ```
 
 ## Plot PCAs
@@ -223,7 +229,7 @@ var_explained <-vsd_pca$sdev^2/sum(vsd_pca$sdev^2)
 plot(var_explained)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 vsd_pca_plot <- vsd_pca$x %>% 
@@ -245,7 +251,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Day,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Day)) +
@@ -258,7 +264,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Day)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Condition,shape=Gate)) +
@@ -271,7 +277,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Condition,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-3.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-3.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
@@ -284,7 +290,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-4.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-4.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayGate,shape=Condition)) +
@@ -296,7 +302,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayGate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-5.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-5.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayCondition,shape=Gate)) +
@@ -308,7 +314,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayCondition,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-6.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-6.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
@@ -321,7 +327,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-7.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-7.png)<!-- -->
 
 ## Plot more components
 
@@ -335,7 +341,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
@@ -348,7 +354,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
@@ -361,7 +367,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-3.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-3.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
@@ -374,7 +380,7 @@ ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-4.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-4.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
@@ -387,7 +393,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-5.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-5.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
@@ -400,7 +406,7 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-6.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-6.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) +
@@ -413,7 +419,7 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-7.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-7.png)<!-- -->
 
 # Correlation Heatmaps - based on 500 top genes
 
@@ -459,7 +465,7 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(g
   theme_bw()
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 ``` r
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(geneid, levels=geneOI)), 
@@ -475,10 +481,10 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(g
   theme_bw()
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->
 
 ``` r
-geneOI_2 <- c("Nkx2-9")
+geneOI_2 <- c("Nkx2-9","Nkx6-1","Foxa1","Phox2b","Neurog3","Uncx","Lhx1","Mnr2")
 
 
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI_2) %>% mutate(geneid=factor(geneid, levels=geneOI_2)), 
@@ -494,7 +500,7 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI_2) %>% mutate(geneid=factor
   theme_bw()
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 # RA Response Genes
 
@@ -515,7 +521,7 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI_RAR) %>% mutate(geneid=fact
   theme_bw()
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
 
 # Analysis without neurons
 
@@ -607,7 +613,7 @@ var_explained <-vsd_pca$sdev^2/sum(vsd_pca$sdev^2)
 plot(var_explained)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
 vsd_pca_plot <- vsd_pca$x %>% 
@@ -629,7 +635,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Day,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Day)) +
@@ -642,7 +648,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Day)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-2.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Condition,shape=Gate)) +
@@ -655,7 +661,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Condition,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-3.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-3.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
@@ -668,7 +674,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-4.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-4.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayGate,shape=Condition)) +
@@ -680,7 +686,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayGate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-5.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-5.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayCondition,shape=Gate)) +
@@ -692,7 +698,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayCondition,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-6.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-6.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
@@ -705,7 +711,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-7.png)<!-- --> \##
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-7.png)<!-- --> \##
 More components
 
 ``` r
@@ -718,7 +724,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
@@ -731,7 +737,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-2.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
@@ -744,7 +750,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-3.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-3.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
@@ -757,7 +763,7 @@ ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-4.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-4.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition,label=Sample)) +
@@ -771,7 +777,7 @@ ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition,label=Sample)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-5.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-5.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
@@ -784,7 +790,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-6.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-6.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
@@ -797,7 +803,7 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-7.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-7.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) +
@@ -810,7 +816,7 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-8.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-8.png)<!-- -->
 
 ``` r
 sessionInfo()
