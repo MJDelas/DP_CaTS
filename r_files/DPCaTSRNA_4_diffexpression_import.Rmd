@@ -91,9 +91,9 @@ re importing does not work because the ~/ gets converted to full name of the dir
 Change working dir to local and it'll be fine. For not, this is the patch. 
 ```{r  import-domain}
 
-PairWiseDEseq_domain <- lapply(list.files(path=paste0(workingdir,subworkinput,suboutdir1),pattern="Results_DESeq*", full.names=TRUE),function(x) {
-  data <- read.table(x,header=T,stringsAsFactors=F) %>% as.data.frame() %>% rownames_to_column("Geneid")
-  data$Comparison <- gsub(paste0("/Users/delasj/Dropbox \\(The Francis Crick\\)/DP_cisReg/",subworkinput,suboutdir1,"/Results_DESeq_"),"", x)
+PairWiseDEseq_domain <- lapply(list.files(path=paste0(workingdir,subworkinput,suboutdir1),pattern="Results_DESeq*", full.names=FALSE),function(x) {
+  data <- read.table(paste0(workingdir,subworkinput,suboutdir1,x),header=T,stringsAsFactors=F) %>% as.data.frame() %>% rownames_to_column("Geneid")
+  data$Comparison <- gsub("Results_DESeq_","", x)
   data$Comparison <- gsub(".txt","",data$Comparison)
   data
 })
@@ -110,9 +110,9 @@ results_deseq_domain <- do.call(rbind,PairWiseDEseq_domain)
 
 ```{r}
 
-PairWiseDEseq_days <- lapply(list.files(path=paste0(workingdir,subworkinput,suboutdir2),pattern="Results_DESeq*", full.names=TRUE),function(x) {
-  data <- read.table(x,header=T,stringsAsFactors=F) %>% as.data.frame() %>% rownames_to_column("Geneid")
-  data$Comparison <- gsub(paste0("/Users/delasj/Dropbox \\(The Francis Crick\\)/DP_cisReg/",subworkinput,suboutdir2,"/Results_DESeq_"),"", x)
+PairWiseDEseq_days <- lapply(list.files(path=paste0(workingdir,subworkinput,suboutdir2),pattern="Results_DESeq*", full.names=FALSE),function(x) {
+  data <- read.table(paste0(workingdir,subworkinput,suboutdir2,x),header=T,stringsAsFactors=F) %>% as.data.frame() %>% rownames_to_column("Geneid")
+  data$Comparison <- gsub("Results_DESeq_","", x)
   data$Comparison <- gsub(".txt","",data$Comparison)
   data
 })
@@ -129,9 +129,9 @@ results_deseq_days <- do.call(rbind,PairWiseDEseq_days)
 
 ```{r}
 
-PairWiseDEseq_conditions <- lapply(list.files(path=paste0(workingdir,subworkinput,suboutdir3),pattern="Results_DESeq*", full.names=TRUE),function(x) {
-  data <- read.table(x,header=T,stringsAsFactors=F) %>% as.data.frame() %>% rownames_to_column("Geneid")
-  data$Comparison <- gsub(paste0("/Users/delasj/Dropbox \\(The Francis Crick\\)/DP_cisReg/",subworkinput,suboutdir3,"/Results_DESeq_"),"", x)
+PairWiseDEseq_conditions <- lapply(list.files(path=paste0(workingdir,subworkinput,suboutdir3),pattern="Results_DESeq*", full.names=FALSE),function(x) {
+  data <- read.table(paste0(workingdir,subworkinput,suboutdir3,x),header=T,stringsAsFactors=F) %>% as.data.frame() %>% rownames_to_column("Geneid")
+  data$Comparison <- gsub("Results_DESeq_","", x)
   data$Comparison <- gsub(".txt","",data$Comparison)
   data
 })
