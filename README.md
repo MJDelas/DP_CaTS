@@ -5,10 +5,12 @@ Analysis of CaTs-ATAC/RNA
 1. CaTS-RNA
     - [PCAs and QC](r_files/DPCaTSRNA_1_PCA.md)
     - [Differential expression analysis code](r_files/DPCaTSATAC_3_diffexpression.md)
-    - [Explore diff exp](r_files/DPCaTSRNA_4_diffexpression_import.md)
+    - [Explore diff import plots](r_files/DPCaTSRNA_4_diffexpression_import.md)
 
 2. CaTS-ATAC
     - [PCAs and QC](r_files/DPCaTSATAC_1_PCA.md)
+    - [Diff access code](r_files/DPCaTSATAC_3_diffexpression.md)
+    - [Diff acc import plots](r_files/DPCaTSATAC_4_diffexpression_import.md)
 
 2. BARRY
     - [First pass](r_files/BARRY_1.md) 
