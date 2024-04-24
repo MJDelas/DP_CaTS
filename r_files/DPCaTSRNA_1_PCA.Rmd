@@ -178,7 +178,7 @@ vsd_data <- subset(vsd_data_unfiltered, select = -D6_UPSAG_pMN_R2)
 
 ## to go it in the top ntop variable genes 
 # calculate the variance for each gene
-rv <- rowVars(vsd_data)
+rv <- rowVars(vsd_data, useNames = TRUE)
 # select the ntop genes by variance
 ntop=500
 select <- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
@@ -534,7 +534,7 @@ vsd_data <- assay(vsd)
 
 ## to go it in the top ntop variable genes 
 # calculate the variance for each gene
-rv <- rowVars(vsd_data)
+rv <- rowVars(vsd_data, useNames = TRUE)
 # select the ntop genes by variance
 ntop=500
 select <- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
