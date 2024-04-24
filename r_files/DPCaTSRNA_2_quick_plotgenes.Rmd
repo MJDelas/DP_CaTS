@@ -1,0 +1,417 @@
+---
+title: "R_quick_plot genes"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# RNA analysis
+Gene plotting with output from previous script.
+
+```{r message=FALSE}
+
+rm(list=ls())
+
+library(RColorBrewer)
+library(tidyverse)
+library(ComplexHeatmap)
+
+
+```
+
+
+
+
+### Set dirs
+```{r}
+
+workingdir="~/Dropbox (The Francis Crick)/DP_cisReg/"
+subworkinput="outputs_CaTSRNA_1/"
+
+
+```
+
+
+## Load RNA data
+
+Normalised RNA counts
+
+```{r }
+
+
+dds_counts <- read.table(paste0(workingdir,subworkinput,"featurecounts.normCounts.txt"),stringsAsFactors =FALSE)
+
+
+```
+
+
+
+
+## Colors and shapes
+Before more plotting, let's get some metadata organised
+
+```{r }
+sorted_gate <- c("pMN","DP","p3","neurons")
+sorted_conditions <- c("500","UPSAG","dRA2UPSAG","dRA")
+
+
+shapes4_manual = c(18,15,16,17) # these are block
+shapes5_manual = c(25,21,22,23,24) # these are filled
+shapes4_fill_manual = c(23,21,22,24)
+# 
+# # for Days
+# red_colors <- c("#fadede","#f3aaaa","#e96666","#cf1e1e")
+
+
+#color_gates <- c("#b30000","#800080","#009640","#696969")
+#color_gates <- c("#b30000","#9a009a","#005ab3","#696969")
+color_gates <- c("#e60000","#cd00cd","#0073e6","#696969")
+
+# for Days
+colors_greys <- c("#f6f6f6","#808080","#333333")
+
+# conditions
+#colors_conditions <- c("#b81bb8","#b81b1b","#1bb81b","#1bb8b8")
+colors_conditions <- c("#e67300","#4d9a00","#cdcd00","#0073e6")
+
+```
+
+
+## Genes to look at
+
+```{r}
+
+dds_counts_plot <- dds_counts %>% 
+  as.data.frame() %>%
+  rownames_to_column("geneid") %>%
+  gather(sampleid, counts_norm, starts_with("D")) %>%
+  separate(sampleid,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) %>%
+  mutate(DayGate=factor(paste(Day,Gate,sep="_")),
+         DayCondition=paste(Day,Condition),
+         Gate=factor(Gate, levels=sorted_gate),
+         Condition=factor(Condition, levels=sorted_conditions))
+
+```
+
+### Basic QC
+
+```{r fig.height=9, fig.width=9}
+
+geneOI <- c("Sox2",
+            "Dbx1","Irx3","Pax6","Nkx6-1","Olig2","Nkx2-2","Foxa2","Shh","Arx",
+            "Tubb3","Sim1","Mnx1")
+
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Condition),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Condition), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=colors_conditions) +
+  scale_color_manual(values=colors_conditions) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Day, scales = "free_y") +
+  theme_bw()
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Day,y=counts_norm)) +
+  stat_summary(aes(fill=Gate),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=color_gates) +
+  scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
+```
+
+
+### Temporal genes from pilot analysis
+
+p3 d6 to d7
+
+```{r fig.height=6, fig.width=9}
+
+geneOI <- c("Lin28a","Nfib","Rbp1","H19","Fabp7","Hoxb6","Nkx6-2","Phox2b")
+
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Condition,y=counts_norm)) +
+  stat_summary(aes(fill=Day),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Day), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  #scale_fill_manual(values=color_gates) +
+  #scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Gate, scales = "free_y") +
+  theme_bw()
+
+```
+
+### What are those neurons?
+
+Just D7:
+
+- dRA: Fev and Gata3 point to more anterior (5HT generation?)
+- dRA also high in Pou3f1 (Alcam), expressed in spinal accessory column (Cervical level)
+
+```{r fig.height=6, fig.width=10}
+
+geneOI <- c("Tubb3","Mnx1","Isl2","Isl1","Neurog2","Lhx3","Lhx1",
+            "Slc18a3","Irx3",
+            "Nkx2-2","Sim1","Neurog3","Phox2b","Pou3f1","Alcam",
+            "Abca1","Fgf10",
+            "Gata3","Fev","Slc17a8","Cyp26b1",
+            "Pou4f2","Lpar1")
+
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Day=="D7") %>% mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Condition),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Condition), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=colors_conditions) +
+  scale_color_manual(values=colors_conditions) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_wrap(~ geneid, scales = "free_y", ncol=4) +
+  theme_bw()
+
+```
+
+### Hoxes
+
+```{r fig.height=6, fig.width=9}
+
+#geneOI <- grep("Hoxc", dds_counts_plot$geneid, value = TRUE)
+
+geneOI <- c("Hoxa1","Hoxa3","Hoxa5","Hoxb2","Hoxb5","Hoxb7","Hoxb8","Hoxc4","Hoxc5","Hoxc6")
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Day=="D7"), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Condition),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Condition), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=colors_conditions) +
+  scale_color_manual(values=colors_conditions) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_wrap(~ geneid, scales = "free_y", ncol=3) +
+  theme_bw()
+
+```
+
+### What are DPs
+
+```{r fig.height=9, fig.width=9}
+
+geneOI <- c("Dll1","Dll3","Neurod4","Nkx2-9",
+            "Hey1","Hey2","Neurog1","Neurog2","Hes1","Hes4","Notch1")
+
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>% 
+        mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Condition),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Condition), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=colors_conditions) +
+  scale_color_manual(values=colors_conditions) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Day, scales = "free_y") +
+  theme_bw()
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Day,y=counts_norm)) +
+  stat_summary(aes(fill=Gate),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=color_gates) +
+  scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         filter(Gate !="neur") %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Day),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Day), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  #scale_fill_manual(values=color_gates) +
+  #scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
+```
+
+Genes from Rayon et al
+
+```{r fig.height=9, fig.width=9}
+
+geneOI <- c("Olig2","Olig1","Nkx2-2","Nkx2-9","Nkx6-1","Nkx6-2","Fabp7",
+            "Sox9","Neurod4","Neurog1","Neurog2","Neurog3")
+
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Day,y=counts_norm)) +
+  stat_summary(aes(fill=Gate),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=color_gates) +
+  scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         filter(Gate !="neur") %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Day),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Day), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  #scale_fill_manual(values=color_gates) +
+  #scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
+```
+
+
+Rayon's "gliogenic score"
+
+FABP7, SOX9, SOX10, PDGFRA, CSPG4, FGFR3, FGFBP3, DBI, SLC1A3, HOPX, ALDH1L1
+
+```{r fig.height=9, fig.width=9}
+
+geneOI <- c("Fabp7","Sox9","Sox10","Pdgfra","Cspg4","Fgfr3","Fgfbp3","Dbi","Slc1a3","Hopx","Aldh1l1")
+
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Day,y=counts_norm)) +
+  stat_summary(aes(fill=Gate),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=color_gates) +
+  scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         filter(Gate !="neur") %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Day),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Day), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  #scale_fill_manual(values=color_gates) +
+  #scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
+```
+
+
+### Wnt genes
+
+following Agalliu et al 
+
+```{r fig.height=6, fig.width=9}
+
+geneOI <- c("Wnt4","Wnt5a","Wnt5b","Wnt1","Wnt7a","Wnt7b")
+
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Day,y=counts_norm)) +
+  stat_summary(aes(fill=Gate),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=color_gates) +
+  scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         filter(Gate !="neur") %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Day),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Day), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  #scale_fill_manual(values=color_gates) +
+  #scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
+```
+
+```{r fig.height=6, fig.width=9}
+
+geneOI <- c("Nkx2-9","Sp8","Foxa2","Phox2b")
+
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Day,y=counts_norm)) +
+  stat_summary(aes(fill=Gate),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=color_gates) +
+  scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         filter(Gate !="neur") %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Day),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Day), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  #scale_fill_manual(values=color_gates) +
+  #scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
+```
+
+
+
+
+
+```{r}
+sessionInfo()
+```
+
+

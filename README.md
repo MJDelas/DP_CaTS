@@ -4,6 +4,7 @@ Analysis of CaTs-ATAC/RNA
 
 1. CaTS-RNA
     - [PCAs and QC](r_files/DPCaTSRNA_1_PCA.md)
+    - [quick plot genes](r_files/DPCaTSRNA_2_quick_plotgenes.md)
     - [Differential expression analysis code](r_files/DPCaTSATAC_3_diffexpression.md)
     - [Explore diff import plots](r_files/DPCaTSRNA_4_diffexpression_import.md)
 
