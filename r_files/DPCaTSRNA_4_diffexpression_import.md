@@ -282,12 +282,11 @@ draw(hmap,
 #### Which genes are shared?
 
 ``` r
-p3_vs_DP <- intersect(intersect(top_domain_comparisons[top_domain_comparisons$Comparison=="_500__D7_Gate_p3_vs_DP","Geneid"],
-top_domain_comparisons[top_domain_comparisons$Comparison=="_dRA2UPSAG__D6_Gate_p3_vs_DP","Geneid"]),
-top_domain_comparisons[top_domain_comparisons$Comparison=="_UPSAG__D7_Gate_p3_vs_DP","Geneid"])
+p3_vs_DP <- intersect(top_domain_comparisons[top_domain_comparisons$Comparison=="_500__D7_Gate_p3_vs_DP","Geneid"],
+top_domain_comparisons[top_domain_comparisons$Comparison=="_500__D6_Gate_p3_vs_DP","Geneid"])
 
 DP_vs_pMN <- intersect(top_domain_comparisons[top_domain_comparisons$Comparison=="_500__D7_Gate_DP_vs_pMN","Geneid"],
-top_domain_comparisons[top_domain_comparisons$Comparison=="_dRA2UPSAG__D6_Gate_DP_vs_pMN","Geneid"])
+top_domain_comparisons[top_domain_comparisons$Comparison=="_500__D6_Gate_DP_vs_pMN","Geneid"])
 ```
 
 ``` r
@@ -343,6 +342,28 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Day %in% c("D5","D6","D7"
     ## data's colour values.
 
 ![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/plot-genes-1.png)<!-- -->
+
+``` r
+geneOI <- intersect(p3_vs_DP,DP_vs_pMN)
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Day %in% c("D5","D6","D7") & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>% 
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Day,y=counts_norm)) +
+  stat_summary(aes(fill=Gate),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=color_gates) +
+  scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+```
+
+    ## Warning: No shared levels found between `names(values)` of the manual scale and the
+    ## data's colour values.
+
+![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ### How many diff acc elements between timepoints?
 
@@ -475,7 +496,7 @@ draw(hmap,
     row_sub_title_side = 'left')
 ```
 
-![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ## Plot number of elements changing between domains and over time
 
