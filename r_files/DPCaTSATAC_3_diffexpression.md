@@ -1,7 +1,7 @@
-RNA_3_diffexpression
+ATAC_3_diffexpression
 ================
 
-# RNA analysis
+# ATAC analysis
 
 Differential expression between gates, conditions and timepoints
 
@@ -20,8 +20,8 @@ library(ggrepel)
 
 ``` r
 workingdir="~/Dropbox (The Francis Crick)/DP_cisReg/"
-subworkinput="inputs_CaTSRNA/"
-outdir="outputs_CaTSRNA_3_diffexpression/"
+subworkinput="inputs_CaTSATAC/"
+outdir="outputs_CaTSATAC_3_diffexpression/"
 
 ifelse(!dir.exists(file.path(workingdir,outdir)), dir.create(file.path(workingdir,outdir)), "Directory exists")
 ```
@@ -58,47 +58,9 @@ ifelse(!dir.exists(file.path(workingdir,outdir,suboutdir4)), dir.create(file.pat
 
 ## Load data
 
-For RNA analysis, we are using the output of star_salmon so the import
-to deseq is a bit more complicated.
-
 ``` r
-#salmon counts from pipeline, import
-path_files =  list.files(paste0(workingdir,subworkinput)) 
-samples = data.frame(run=path_files, stringsAsFactors = FALSE) %>%
-  filter(str_detect(run, "^D"))
-
-files <- file.path(paste0(workingdir,subworkinput), samples$run, "quant.sf")
-names(files) <- samples$run
-all(file.exists(files))
+count.table <- read.table(paste0(workingdir,subworkinput,"consensus_peaks.mLb.clN.featureCounts.txt"), header = TRUE, sep="\t")
 ```
-
-    ## [1] TRUE
-
-``` r
-#from pipeline
-tx2gene = read_tsv(paste0(paste0(workingdir,subworkinput),"/salmon_tx2gene.tsv"))
-```
-
-    ## New names:
-    ## Rows: 35118 Columns: 3
-    ## ── Column specification
-    ## ──────────────────────────────────────────────────────── Delimiter: "\t" chr
-    ## (3): NM_001011874, Xkr4...2, Xkr4...3
-    ## ℹ Use `spec()` to retrieve the full column specification for this data. ℹ
-    ## Specify the column types or set `show_col_types = FALSE` to quiet this message.
-    ## • `Xkr4` -> `Xkr4...2`
-    ## • `Xkr4` -> `Xkr4...3`
-
-``` r
-txi.salmon <- tximport(files, type = "salmon", tx2gene = tx2gene)
-```
-
-    ## reading in files with read_tsv
-    ## 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 
-    ## transcripts missing from tx2gene: 1
-    ## summarizing abundance
-    ## summarizing counts
-    ## summarizing length
 
 ## Colors and shapes
 
@@ -122,22 +84,19 @@ colors_greys <- c("#f6f6f6","#808080","#333333")
 colors_conditions <- c("#e67300","#4d9a00","#cdcd00","#0073e6")
 ```
 
-## Differential analysis between domains for a given timepoint and condition
+From here copied
 
-The lapply is not running yet because I need to filter the comparisons
-with enough samples.
+## Differential analysis between domains for a given timepoint and condition
 
 Targeted diff analysis in subsets of samples: - for each timepoint: diff
 expression between domains
 
 - make a extra lapply to go through conditions
 
-This DESeq2 analysis is done by subsetting samples. I subset the
-`txi.salmon$counts` table and then use `DESeqDataSetFromMatrix` with
-`round(sub_counts)` to perform the differential analysis.
+This DESeq2 analysis is done by subsetting samples.
 
 ``` r
-count_matrix <- txi.salmon$counts %>%
+count_matrix <- count.table %>%
   as.data.frame()
 
 
@@ -174,7 +133,7 @@ PairWiseDEseq <-  lapply(c(1:length(treatment)),function (i) {
         
       ## if_else statement because many comparisons do not have enough samples
         
-        if(ncol(sub_counts)==4){
+        if(ncol(sub_counts)>=4){
       
           ## Make metadata file for DESeq
           genecolData_sub <- data.frame(Sample = colnames(sub_counts))
@@ -250,13 +209,13 @@ PairWiseDEseq <-  lapply(c(1:length(treatment)),function (i) {
           ## Export files
           
           write.table(dds_sub_counts,
-          file = paste0(workingdir,outdir,suboutdir1,"CountsNormalized_",regime,timepoints,resultsNames(dds_sub)[2],".txt"),
+          file = paste0(workingdir,outdir,suboutdir1,"CountsNormalized_",regime,"_",timepoints,resultsNames(dds_sub)[2],".txt"),
               quote = FALSE, row.names = TRUE)
           write.csv(vsd_sub_data,
-              paste0(workingdir,outdir,suboutdir1,"VSData_",regime,timepoints,resultsNames(dds_sub)[2],".csv"),
+              paste0(workingdir,outdir,suboutdir1,"VSData_",regime,"_",timepoints,resultsNames(dds_sub)[2],".csv"),
               quote = FALSE)
           write.table(results_sub,
-              file = paste0(workingdir,outdir,suboutdir1,"Results_DESeq_",regime,timepoints,resultsNames(dds_sub)[2],".txt"),
+              file = paste0(workingdir,outdir,suboutdir1,"Results_DESeq_",regime,"_",timepoints,resultsNames(dds_sub)[2],".txt"),
               quote = FALSE, row.names = TRUE)
     
           results_return <- results_sub %>% as.data.frame() %>% rownames_to_column("Geneid")
@@ -302,7 +261,7 @@ PairWiseDEseq <- lapply(c(1:length(treatment)),function (i) {
         
          ## if_else statement because many comparisons do not have enough samples
         
-        if(ncol(sub_counts)==4){
+        if(ncol(sub_counts)>=4){
         
         ## Make metadata file for DESeq
         genecolData_sub <- data.frame(Sample = colnames(sub_counts))
@@ -428,7 +387,7 @@ PairWiseDEseq <-  lapply(c(1:length(timepoint)),function (i) {
           dplyr::select(contains(timepoints)  & contains(celltypes) & contains(conditions))
         
          ## if_else statement because many comparisons do not have enough samples
-        if(ncol(sub_counts)==4){
+        if(ncol(sub_counts)>=4){
           
         ## Make metadata file for DESeq
         genecolData_sub <- data.frame(Sample = colnames(sub_counts))
@@ -532,7 +491,7 @@ PairWiseDEseq <-  lapply(c(1:length(timepoint)),function (i) {
 - exclude D7 dRA p3 because they are Floor plate
 
 ``` r
-count_matrix <- txi.salmon$counts %>%
+count_matrix <- count.table %>%
   as.data.frame()
 
 
@@ -652,7 +611,7 @@ PairWiseDEseq <-
 Compare upsag d7 and 500 d6. Is anything different from 500 d7 vs d6?
 
 ``` r
-samples_wanted <- c("D7_UPSAG_p3","D6_500_p3")
+samples_wanted <- c("D7_UPSAG_p3","D5_500_p3")
         # timepoints <- timepoint[i]
         # celltypes <- allgates[x]
         # conditions <- comparisons[,y]
@@ -707,7 +666,7 @@ samples_wanted <- c("D7_UPSAG_p3","D6_500_p3")
             #ylim(-threshold,threshold) +
             scale_x_log10() +
             scale_color_manual(values = c("gray30","#d83a00","#ff9b76","#ffd4c4")) +
-            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange > 0),
+            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange > 2),
                     nudge_y = 20,
                     #nudge_x=-10,
                     #force_pull   = 10,
@@ -716,7 +675,7 @@ samples_wanted <- c("D7_UPSAG_p3","D6_500_p3")
                     box.padding = 0.5,
                     segment.color = "grey50",
                     direction     = "both") +
-            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange < 0),
+            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange < -2),
                     nudge_y = -20,
                     #nudge_x=-10,
                     #force_pull   = 10,
@@ -794,21 +753,19 @@ sessionInfo()
     ## [10] magrittr_2.0.3          compiler_4.3.3          rlang_1.1.3            
     ## [13] tools_4.3.3             utf8_1.2.4              yaml_2.3.8             
     ## [16] knitr_1.45              labeling_0.4.3          S4Arrays_1.2.1         
-    ## [19] bit_4.0.5               DelayedArray_0.28.0     abind_1.4-5            
-    ## [22] BiocParallel_1.36.0     withr_3.0.0             fansi_1.0.6            
-    ## [25] colorspace_2.1-0        scales_1.3.0            iterators_1.0.14       
-    ## [28] cli_3.6.2               rmarkdown_2.26          crayon_1.5.2           
-    ## [31] ragg_1.3.0              generics_0.1.3          rstudioapi_0.16.0      
-    ## [34] tzdb_0.4.0              rjson_0.2.21            zlibbioc_1.48.2        
-    ## [37] parallel_4.3.3          XVector_0.42.0          vctrs_0.6.5            
-    ## [40] Matrix_1.6-5            jsonlite_1.8.8          hms_1.1.3              
-    ## [43] GetoptLong_1.0.5        bit64_4.0.5             clue_0.3-65            
-    ## [46] systemfonts_1.0.6       locfit_1.5-9.9          foreach_1.5.2          
-    ## [49] glue_1.7.0              codetools_0.2-20        stringi_1.8.3          
-    ## [52] gtable_0.3.4            shape_1.4.6.1           munsell_0.5.1          
-    ## [55] pillar_1.9.0            htmltools_0.5.8         GenomeInfoDbData_1.2.11
-    ## [58] circlize_0.4.16         R6_2.5.1                textshaping_0.3.7      
-    ## [61] doParallel_1.0.17       vroom_1.6.5             evaluate_0.23          
-    ## [64] lattice_0.22-6          png_0.1-8               Rcpp_1.0.12            
-    ## [67] SparseArray_1.2.4       xfun_0.43               pkgconfig_2.0.3        
-    ## [70] GlobalOptions_0.1.2
+    ## [19] DelayedArray_0.28.0     abind_1.4-5             BiocParallel_1.36.0    
+    ## [22] withr_3.0.0             fansi_1.0.6             colorspace_2.1-0       
+    ## [25] scales_1.3.0            iterators_1.0.14        cli_3.6.2              
+    ## [28] rmarkdown_2.26          crayon_1.5.2            ragg_1.3.0             
+    ## [31] generics_0.1.3          rstudioapi_0.16.0       tzdb_0.4.0             
+    ## [34] rjson_0.2.21            zlibbioc_1.48.2         parallel_4.3.3         
+    ## [37] XVector_0.42.0          vctrs_0.6.5             Matrix_1.6-5           
+    ## [40] hms_1.1.3               GetoptLong_1.0.5        clue_0.3-65            
+    ## [43] systemfonts_1.0.6       locfit_1.5-9.9          foreach_1.5.2          
+    ## [46] glue_1.7.0              codetools_0.2-20        stringi_1.8.3          
+    ## [49] gtable_0.3.4            shape_1.4.6.1           munsell_0.5.1          
+    ## [52] pillar_1.9.0            htmltools_0.5.8         GenomeInfoDbData_1.2.11
+    ## [55] circlize_0.4.16         R6_2.5.1                textshaping_0.3.7      
+    ## [58] doParallel_1.0.17       evaluate_0.23           lattice_0.22-6         
+    ## [61] png_0.1-8               Rcpp_1.0.12             SparseArray_1.2.4      
+    ## [64] xfun_0.43               pkgconfig_2.0.3         GlobalOptions_0.1.2

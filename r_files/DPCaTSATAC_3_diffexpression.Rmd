@@ -51,7 +51,11 @@ ifelse(!dir.exists(file.path(workingdir,outdir,suboutdir4)), dir.create(file.pat
 
 ## Load data
 
-Load the diff expression from previous script.
+```{r}
+
+count.table <- read.table(paste0(workingdir,subworkinput,"consensus_peaks.mLb.clN.featureCounts.txt"), header = TRUE, sep="\t")
+
+```
 
 
 ## Colors and shapes
@@ -77,113 +81,651 @@ colors_conditions <- c("#e67300","#4d9a00","#cdcd00","#0073e6")
 ```
 
 
-##Load vsd to plot heatmaps later
+From here copied
+
+## Differential analysis between domains for a given timepoint and condition
 
 
-```{r }
+Targeted diff analysis in subsets of samples:
+- for each timepoint: diff expression between domains
 
-count_vsd <- read.csv(file=paste0(workingdir,"outputs_CaTSATAC_3_diffexpression/","consensus_peaks.mLb.clN.featureCounts.csv"),header=TRUE, stringsAsFactors = FALSE)
+- make a extra lapply to go through conditions
 
-dds_counts <- read.table(file=paste0(workingdir,"outputs_CaTSATAC_3_diffexpression/","consensus_peaks.mLb.clN.featureCounts.txt"),header=TRUE, stringsAsFactors = FALSE)
+This DESeq2 analysis is done by subsetting samples.
 
-```
+```{r message = FALSE, warning=FALSE}
+
+count_matrix <- count.table %>%
+  as.data.frame()
 
 
-Differential analysis between domains for a given timepoint and condition
+#subset 
+treatment=c("_500_","_UPSAG_","_dRA_","_dRA2UPSAG_")
 
-• For a given timepoint and a given condition
-• Differential gene expression between domains
+timepoint=c("D5_","D6_","D7_")
 
-```{r }
+#matrix
+allgates=matrix(c("_pMN_","_p3_","_pMN_","_DP_","_p3_","_DP_"),
+                 nrow=2,
+                 ncol=3)
 
-PairWiseDEseq_domain <- lapply(list.files(path=paste0(workingdir,subworkinput,suboutdir1),pattern="Results_DESeq*", full.names=FALSE),function(x) {
-  data <- read.table(paste0(workingdir,subworkinput,suboutdir1,x),header=T,stringsAsFactors=F) %>% as.data.frame() %>% rownames_to_column("Geneid")
-  data$Comparison <- gsub("Results_DESeq_","", x)
-  data$Comparison <- gsub(".txt","",data$Comparison)
-  data
+comparisons <- allgates
+
+# count_matrix <- count_table %>%
+#   column_to_rownames("Geneid")
+
+
+# x=3
+# y=2
+# i=3
+
+## many comparisons do not have 2 reps and 2 conditions
+
+PairWiseDEseq <-  lapply(c(1:length(treatment)),function (i) {
+  lapply(c(1:length(timepoint)),function (x) {
+    lapply(c(1:ncol(allgates)), function (y) {
+        regime <- treatment[i]
+        timepoints <- timepoint[x]
+        celltypes <- allgates[,y]
+        sub_counts <- count_matrix %>%
+          dplyr::select(contains(regime)  & contains(celltypes) & contains(timepoints))
+        
+      ## if_else statement because many comparisons do not have enough samples
+        
+        if(ncol(sub_counts)>=4){
+      
+          ## Make metadata file for DESeq
+          genecolData_sub <- data.frame(Sample = colnames(sub_counts))
+          genecolData_sub <- genecolData_sub %>% 
+            separate(Sample,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) %>%
+            mutate(DayGate=factor(paste(Day,Gate,sep="_")),
+                  DayCondition=paste(Day,Condition),
+                  Experiment=paste(Condition,Rep,sep="_"),
+                  Gate=factor(Gate, levels=sorted_gate))
+          genecolData_sub <- as.data.frame(unclass(genecolData_sub))
+          
+          
+          dds_sub <- DESeqDataSetFromMatrix(countData =  round(sub_counts),
+                                  colData = genecolData_sub,
+                                  design = ~ Gate)
+              
+          dds_sub <- DESeq(dds_sub)
+          
+          vsd_sub <- varianceStabilizingTransformation(dds_sub,blind = FALSE)
+          
+          # Export normalized tables for plotting elsewhere
+          dds_sub_counts <- counts(dds_sub, normalized = TRUE)
+          vsd_sub_data <- assay(vsd_sub)
+          
+          results_sub <- results(dds_sub)
+    
+          # color significant
+          results_sub_plot1 <- results_sub %>%
+            as.data.frame() %>%
+            rownames_to_column("geneid") %>%
+            mutate(color_sig=case_when(padj < 0.1 & padj > 0.01 ~ "under01",
+                                       padj < 0.01 & padj > 0.001 ~ "under001",
+                                       padj < 0.001 & padj >0 ~ "under0001",
+                                       TRUE ~ "over01"))
+          
+          #threshold <- 8
+          plot_ma <- ggplot(results_sub_plot1 %>% as.data.frame(), aes(x=baseMean, y=log2FoldChange, color=color_sig, label=geneid)) +
+              geom_point(size=1) +
+              # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange > threshold,],
+              #           aes(x=baseMean, y=threshold), shape = 2, colour="#d83a00") +
+              # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange < -threshold,],
+              #           aes(x=baseMean, y=-threshold), shape = 2, colour="#d83a00") +
+              #ylim(-threshold,threshold) +
+              scale_x_log10() +
+              scale_color_manual(values = c("gray30","#d83a00","#ff9b76","#ffd4c4")) +
+              geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange > 0),
+                      nudge_y = 10,
+                      #nudge_x=-10,
+                      #force_pull   = 10,
+                      force         = 65,
+                      max.overlaps = Inf,
+                      box.padding = 0.5,
+                      segment.color = "grey50",
+                      direction     = "both") +
+              geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange < 0),
+                      nudge_y = -20,
+                      #nudge_x=-10,
+                      #force_pull   = 10,
+                      force         = 65,
+                      max.overlaps = Inf,
+                      box.padding = 0.5,
+                      segment.color = "grey50",
+                      direction     = "both") +
+              ylab(paste0("log2 Fold Change ", resultsNames(dds_sub)[2] ," RNA")) +
+              ggtitle(paste0("Results ",regime,timepoints,resultsNames(dds_sub)[2])) +
+              theme_bw() 
+          
+          # print plot
+          ggsave(paste0(workingdir,outdir,suboutdir1,"MAplot_",regime,timepoints,resultsNames(dds_sub)[2],".pdf"), plot=plot_ma,
+           width=5, height=3, units="in", useDingbats=FALSE)
+          
+    
+          ## Export files
+          
+          write.table(dds_sub_counts,
+          file = paste0(workingdir,outdir,suboutdir1,"CountsNormalized_",regime,"_",timepoints,resultsNames(dds_sub)[2],".txt"),
+              quote = FALSE, row.names = TRUE)
+          write.csv(vsd_sub_data,
+              paste0(workingdir,outdir,suboutdir1,"VSData_",regime,"_",timepoints,resultsNames(dds_sub)[2],".csv"),
+              quote = FALSE)
+          write.table(results_sub,
+              file = paste0(workingdir,outdir,suboutdir1,"Results_DESeq_",regime,"_",timepoints,resultsNames(dds_sub)[2],".txt"),
+              quote = FALSE, row.names = TRUE)
+    
+          results_return <- results_sub %>% as.data.frame() %>% rownames_to_column("Geneid")
+          #results_return$Comparison <- paste0("Comp_",timepoints,celltypes[1],celltypes[2])
+          results_return$Comparison <- paste0("Comp_",regime,timepoints,resultsNames(dds_sub)[2])
+          results_return
+        } 
+  
+    })
+  })
 })
 
-results_deseq_domain <- do.call(rbind,PairWiseDEseq_domain)
+```
+
+## Differential analysis between timepoints for each domain and condition 
+
+For each gate:
+- differential analysis between timepoints for the same condition: To do, extra lapply for conditions 
+
+
+
+```{r message = FALSE, warning=FALSE}
+
+#subset 
+treatment=c("_500_","_UPSAG_","_dRA_","_dRA2UPSAG_")
+
+allgates=c("_pMN_","_p3_","_DP_")
+#matrix
+timepoints=matrix(c("D5_","D6_","D5_","D7_","D6_","D7_"),
+                 nrow=2,
+                 ncol=3)
+
+comparisons <- timepoints
+
+# i=1
+# x=2
+# y=3
+
+PairWiseDEseq <- lapply(c(1:length(treatment)),function (i) {
+  lapply(c(1:length(allgates)),function (x) {
+    lapply(c(1:ncol(timepoints)), function (y) {
+        regime <- treatment[i]
+        celltypes <- allgates[x]
+        days <- timepoints[,y]
+        sub_counts <- count_matrix %>%
+          dplyr::select(contains(regime)  & contains(celltypes) & contains(days))
+        
+         ## if_else statement because many comparisons do not have enough samples
+        
+        if(ncol(sub_counts)>=4){
+        
+        ## Make metadata file for DESeq
+        genecolData_sub <- data.frame(Sample = colnames(sub_counts))
+        genecolData_sub <- genecolData_sub %>% 
+          separate(Sample,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) %>%
+          mutate(DayGate=factor(paste(Day,Gate,sep="_")),
+                DayCondition=paste(Day,Condition),
+                Experiment=paste(Condition,Rep,sep="_"),
+                Gate=factor(Gate, levels=sorted_gate))
+        genecolData_sub <- as.data.frame(unclass(genecolData_sub))
+           
+        dds_sub <- DESeqDataSetFromMatrix(countData = round(sub_counts),
+                                      colData = genecolData_sub,
+                                      design = ~ Day)
+        
+        dds_sub <- DESeq(dds_sub)
+        
+        vsd_sub <- varianceStabilizingTransformation(dds_sub,blind = FALSE)
+        
+        # Export normalized tables for plotting elsewhere
+        dds_sub_counts <- counts(dds_sub, normalized = TRUE)
+        vsd_sub_data <- assay(vsd_sub)
+        
+        results_sub <- results(dds_sub)
+        
+        ## plot MA custom plot 
+        
+        #plotMA(results_sub,ylim=c(-8,8))
+        
+        # color significant
+        results_sub_plot1 <- results_sub %>%
+          as.data.frame() %>%
+          rownames_to_column("geneid") %>%
+          mutate(color_sig=case_when(padj < 0.1 & padj > 0.01 ~ "under01",
+                                     padj < 0.01 & padj > 0.001 ~ "under001",
+                                     padj < 0.001 & padj >0 ~ "under0001",
+                                     TRUE ~ "over01"))
+        
+        #threshold <- 8
+         plot_ma <- ggplot(results_sub_plot1 %>% as.data.frame(), aes(x=baseMean, y=log2FoldChange, color=color_sig, label=geneid)) +
+            geom_point(size=1) +
+            # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange > threshold,],
+            #           aes(x=baseMean, y=threshold), shape = 2, colour="#d83a00") +
+            # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange < -threshold,],
+            #           aes(x=baseMean, y=-threshold), shape = 2, colour="#d83a00") +
+            #ylim(-threshold,threshold) +
+            scale_x_log10() +
+            scale_color_manual(values = c("gray30","#d83a00","#ff9b76","#ffd4c4")) +
+            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange > 0),
+                    nudge_y = 10,
+                    #nudge_x=-10,
+                    #force_pull   = 10,
+                    force         = 65,
+                    max.overlaps = Inf,
+                    box.padding = 0.5,
+                    segment.color = "grey50",
+                    direction     = "both") +
+            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange < 0),
+                    nudge_y = -20,
+                    #nudge_x=-10,
+                    #force_pull   = 10,
+                    force         = 65,
+                    max.overlaps = Inf,
+                    box.padding = 0.5,
+                    segment.color = "grey50",
+                    direction     = "both") +
+            ylab(paste0("log2 Fold Change ",resultsNames(dds_sub)[2]," RNA")) +
+            ggtitle(paste0("Results ",regime,celltypes,resultsNames(dds_sub)[2] )) +
+            theme_bw() 
+        
+         # print plot
+          ggsave(paste0(workingdir,outdir,suboutdir2,"MAplot_",regime,celltypes,resultsNames(dds_sub)[2],".pdf"), plot=plot_ma,
+           width=5, height=3, units="in", useDingbats=FALSE)
+        
+        ## Export files
+        
+        write.table(dds_sub_counts,
+        file = paste0(workingdir,outdir,suboutdir2,"CountsNormalized_",regime,celltypes,resultsNames(dds_sub)[2],".txt"),
+            quote = FALSE, row.names = TRUE)
+        write.csv(vsd_sub_data,
+            paste0(workingdir,outdir,suboutdir2,"VSData_",regime,celltypes,resultsNames(dds_sub)[2],".csv"),
+            quote = FALSE)
+        write.table(results_sub,
+            file = paste0(workingdir,outdir,suboutdir2,"Results_DESeq_",regime,celltypes,resultsNames(dds_sub)[2],".txt"),
+            quote = FALSE, row.names = TRUE)
+
+        results_return <- results_sub %>% as.data.frame() %>% rownames_to_column("Geneid")
+        results_return$Comparison <- paste0("Comp_",regime,celltypes,resultsNames(dds_sub)[2])
+        results_return
+        }
+    })
+  }) 
+}) 
 
 ```
 
+## Differential analysis between conditions for each domain and timepoint 
+
+For a given timepoint
+- differential analysis between conditions each cell type
 
 
-Differential analysis between timepoints for each domain and condition
-• For a given domain and a given condition
-• Differential gene expression between timepoints
+```{r message = FALSE, warning=FALSE}
+
+#subset
+timepoint=c("D5_","D6_","D7_")
+allgates=c("_pMN_","_p3_","_DP_","_neurons_")
+#matrix
+comparisons=matrix(c("_500_","_UPSAG_","_UPSAG_","_dRA2UPSAG_","_dRA2UPSAG_","_dRA_",
+                    "_500_","_dRA2UPSAG_","_500_","_dRA_","_UPSAG_","_dRA_"),
+                 nrow=2,
+                 ncol=6)
 
 
-```{r }
+# i=3
+# x=2
+# y=5
 
+PairWiseDEseq <-  lapply(c(1:length(timepoint)),function (i) {
+  lapply(c(1:length(allgates)),function (x) {
+    lapply(c(1:ncol(comparisons)), function (y) {
+        timepoints <- timepoint[i]
+        celltypes <- allgates[x]
+        conditions <- comparisons[,y]
+        sub_counts <- count_matrix %>%
+          dplyr::select(contains(timepoints)  & contains(celltypes) & contains(conditions))
+        
+         ## if_else statement because many comparisons do not have enough samples
+        if(ncol(sub_counts)>=4){
+          
+        ## Make metadata file for DESeq
+        genecolData_sub <- data.frame(Sample = colnames(sub_counts))
+        genecolData_sub <- genecolData_sub %>% 
+          separate(Sample,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) %>%
+          mutate(DayGate=factor(paste(Day,Gate,sep="_")),
+                DayCondition=paste(Day,Condition),
+                Experiment=paste(Condition,Rep,sep="_"),
+                Gate=factor(Gate, levels=sorted_gate))
+        genecolData_sub <- as.data.frame(unclass(genecolData_sub))
+           
+        dds_sub <- DESeqDataSetFromMatrix(countData = round(sub_counts),
+                                      colData = genecolData_sub,
+                                      design = ~ Condition)
+        
+        dds_sub <- DESeq(dds_sub)
+        
+        vsd_sub <- varianceStabilizingTransformation(dds_sub,blind = FALSE)
+        
+        # Export normalized tables for plotting elsewhere
+        dds_sub_counts <- counts(dds_sub, normalized = TRUE)
+        vsd_sub_data <- assay(vsd_sub)
+        
+        results_sub <- results(dds_sub)
+        
+        ## plot MA custom plot 
+        
+        #plotMA(results_sub,ylim=c(-8,8))
+        
+        # color significant
+        results_sub_plot1 <- results_sub %>%
+          as.data.frame() %>%
+          rownames_to_column("geneid") %>%
+          mutate(color_sig=case_when(padj < 0.1 & padj > 0.01 ~ "under01",
+                                     padj < 0.01 & padj > 0.001 ~ "under001",
+                                     padj < 0.001 & padj >0 ~ "under0001",
+                                     TRUE ~ "over01"))
+        
+        #threshold <- 8
+        plot_ma <-ggplot(results_sub_plot1 %>% as.data.frame(), aes(x=baseMean, y=log2FoldChange, color=color_sig, label=geneid)) +
+            geom_point(size=1) +
+            # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange > threshold,],
+            #           aes(x=baseMean, y=threshold), shape = 2, colour="#d83a00") +
+            # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange < -threshold,],
+            #           aes(x=baseMean, y=-threshold), shape = 2, colour="#d83a00") +
+            #ylim(-threshold,threshold) +
+            scale_x_log10() +
+            scale_color_manual(values = c("gray30","#d83a00","#ff9b76","#ffd4c4")) +
+            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange > 0),
+                    nudge_y = 20,
+                    #nudge_x=-10,
+                    #force_pull   = 10,
+                    force         = 65,
+                    max.overlaps = Inf,
+                    box.padding = 0.5,
+                    segment.color = "grey50",
+                    direction     = "both") +
+            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange < 0),
+                    nudge_y = -20,
+                    #nudge_x=-10,
+                    #force_pull   = 10,
+                    force         = 65,
+                    max.overlaps = Inf,
+                    box.padding = 0.5,
+                    segment.color = "grey50",
+                    direction     = "both") +
+            ylab(paste0("log2 Fold Change ",resultsNames(dds_sub)[2]," RNA")) +
+            ggtitle(paste0("Results ",timepoints,celltypes,resultsNames(dds_sub)[2])) +
+            theme_bw() 
+        
+        # print plot
+          ggsave(paste0(workingdir,outdir,suboutdir3,"MAplot_",timepoints,celltypes,resultsNames(dds_sub)[2],".pdf"), plot=plot_ma,
+           width=5, height=3, units="in", useDingbats=FALSE)
+        
+        
+        ## Export files
+        
+        write.table(dds_sub_counts,
+        file = paste0(workingdir,outdir,suboutdir3,"CountsNormalized_",timepoints,celltypes,resultsNames(dds_sub)[2],".txt"),
+            quote = FALSE, row.names = TRUE)
+        write.csv(vsd_sub_data,
+            paste0(workingdir,outdir,suboutdir3,"VSData_",timepoints,celltypes,resultsNames(dds_sub)[2],".csv"),
+            quote = FALSE)
+        write.table(results_sub,
+            file = paste0(workingdir,outdir,suboutdir3,"Results_DESeq_",timepoints,celltypes,resultsNames(dds_sub)[2],".txt"),
+            quote = FALSE, row.names = TRUE)
 
-PairWiseDEseq_days <- lapply(list.files(path=paste0(workingdir,subworkinput,suboutdir2),pattern="Results_DESeq*", full.names=FALSE),function(x) {
-  data <- read.table(paste0(workingdir,subworkinput,suboutdir2,x),header=T,stringsAsFactors=F) %>% as.data.frame() %>% rownames_to_column("Geneid")
-  data$Comparison <- gsub("Results_DESeq_","", x)
-  data$Comparison <- gsub(".txt","",data$Comparison)
-  data
+        results_return <- results_sub %>% as.data.frame() %>% rownames_to_column("Geneid")
+        results_return$Comparison <- paste0("Comp_",timepoints,celltypes,resultsNames(dds_sub)[2])
+        results_return
+        }
+    })
+  })
 })
 
-results_deseq_days <- do.call(rbind,PairWiseDEseq_days)
 ```
 
+## Between cell types: ignoring signaling regime and timepoint
 
-Differential analysis between conditions for each domain and timepoint
-• For a given timepoint and a given domain
-• Differential gene expression between conditions
+- to get the main genes, but I will also intersect all the different comparisons in the next script
+- exclude D7 dRA p3 because they are Floor plate
+
+```{r message = FALSE, warning=FALSE}
+
+count_matrix <- count.table %>%
+  as.data.frame()
 
 
-```{r }
+#subset 
+treatment=c("_500_","_UPSAG_","_dRA2UPSAG_")
+#matrix
+allgates=matrix(c("_pMN_","_p3_","_pMN_","_DP_","_p3_","_DP_"),
+                 nrow=2,
+                 ncol=3)
 
-PairWiseDEseq_conditions <- lapply(list.files(path=paste0(workingdir,subworkinput,suboutdir3),pattern="Results_DESeq*", full.names=TRUE),function(x) {
-  data - read.table(x,header=T,stringsAsFactors=F) %% as.data.frame() %>% rownames_to_column("Geneid")
-  data$Comparison <- gsub(paste0("/Users/delasj/Dropbox \\(The Francis Crick\\)/DP_cisReg/",subworkinput,suboutdir3,"/Results_DESeq_"),"", x)
-  data$Comparison <- gsub(".txt","",data$Comparison)
-  data
+comparisons <- allgates
+
+y=3
+
+
+## many comparisons do not have 2 reps and 2 conditions
+
+PairWiseDEseq <-
+    lapply(c(1:ncol(allgates)), function (y) {
+        celltypes <- allgates[,y]
+        sub_counts <- count_matrix %>%
+          dplyr::select(contains(celltypes) & contains(treatment))
+  
+      
+          ## Make metadata file for DESeq
+          genecolData_sub <- data.frame(Sample = colnames(sub_counts))
+          genecolData_sub <- genecolData_sub %>% 
+            separate(Sample,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) %>%
+            mutate(DayGate=factor(paste(Day,Gate,sep="_")),
+                  DayCondition=paste(Day,Condition),
+                  Experiment=paste(Condition,Rep,sep="_"),
+                  Gate=factor(Gate, levels=sorted_gate))
+          genecolData_sub <- as.data.frame(unclass(genecolData_sub))
+          
+          
+          dds_sub <- DESeqDataSetFromMatrix(countData =  round(sub_counts),
+                                  colData = genecolData_sub,
+                                  design = ~ Gate)
+              
+          dds_sub <- DESeq(dds_sub)
+          
+          vsd_sub <- varianceStabilizingTransformation(dds_sub,blind = FALSE)
+          
+          # Export normalized tables for plotting elsewhere
+          dds_sub_counts <- counts(dds_sub, normalized = TRUE)
+          vsd_sub_data <- assay(vsd_sub)
+          
+          results_sub <- results(dds_sub)
+    
+          # color significant
+          results_sub_plot1 <- results_sub %>%
+            as.data.frame() %>%
+            rownames_to_column("geneid") %>%
+            mutate(color_sig=case_when(padj < 0.1 & padj > 0.01 ~ "under01",
+                                       padj < 0.01 & padj > 0.001 ~ "under001",
+                                       padj < 0.001 & padj >0 ~ "under0001",
+                                       TRUE ~ "over01"))
+          
+          #threshold <- 8
+          plot_ma <- ggplot(results_sub_plot1 %>% as.data.frame(), aes(x=baseMean, y=log2FoldChange, color=color_sig, label=geneid)) +
+              geom_point(size=1) +
+              # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange > threshold,],
+              #           aes(x=baseMean, y=threshold), shape = 2, colour="#d83a00") +
+              # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange < -threshold,],
+              #           aes(x=baseMean, y=-threshold), shape = 2, colour="#d83a00") +
+              #ylim(-threshold,threshold) +
+              scale_x_log10() +
+              scale_color_manual(values = c("gray30","#d83a00","#ff9b76","#ffd4c4")) +
+              geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange > 2),
+                      nudge_y = 30,
+                      #nudge_x=-10,
+                      #force_pull   = 10,
+                      force         = 65,
+                      max.overlaps = Inf,
+                      box.padding = 0.5,
+                      segment.color = "grey50",
+                      direction     = "both") +
+              geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange < -2),
+                      nudge_y = -30,
+                      #nudge_x=-10,
+                      #force_pull   = 10,
+                      force         = 65,
+                      max.overlaps = Inf,
+                      box.padding = 0.5,
+                      segment.color = "grey50",
+                      direction     = "both") +
+              ylab(paste0("log2 Fold Change ", resultsNames(dds_sub)[2] ," RNA")) +
+              ggtitle(paste0("Results ",resultsNames(dds_sub)[2])) +
+              theme_bw() 
+          
+          # print plot
+          ggsave(paste0(workingdir,outdir,suboutdir4,"MAplot_",resultsNames(dds_sub)[2],".pdf"), plot=plot_ma,
+           width=5, height=3, units="in", useDingbats=FALSE)
+          
+    
+          ## Export files
+          
+          write.table(dds_sub_counts,
+          file = paste0(workingdir,outdir,suboutdir4,"CountsNormalized_",resultsNames(dds_sub)[2],".txt"),
+              quote = FALSE, row.names = TRUE)
+          write.csv(vsd_sub_data,
+              paste0(workingdir,outdir,suboutdir4,"VSData_",resultsNames(dds_sub)[2],".csv"),
+              quote = FALSE)
+          write.table(results_sub,
+              file = paste0(workingdir,outdir,suboutdir4,"Results_DESeq_",resultsNames(dds_sub)[2],".txt"),
+              quote = FALSE, row.names = TRUE)
+    
+          results_return <- results_sub %>% as.data.frame() %>% rownames_to_column("Geneid")
+          #results_return$Comparison <- paste0("Comp_",timepoints,celltypes[1],celltypes[2])
+          results_return$Comparison <- paste0("Comp_",resultsNames(dds_sub)[2])
+          results_return
 })
 
-results_deseq_conditions <- do.call(rbind,PairWiseDEseq_days)
+```
+
+### Targetted p3 analysis
+
+Compare upsag d7 and 500 d6. Is anything different from 500 d7 vs d6?
+
+```{r message = FALSE, warning=FALSE}
+
+samples_wanted <- c("D7_UPSAG_p3","D5_500_p3")
+        # timepoints <- timepoint[i]
+        # celltypes <- allgates[x]
+        # conditions <- comparisons[,y]
+        sub_counts <- count_matrix %>%
+          dplyr::select(contains(samples_wanted))
+        
+
+        ## Make metadata file for DESeq
+        genecolData_sub <- data.frame(Sample = colnames(sub_counts))
+        genecolData_sub <- genecolData_sub %>% 
+          separate(Sample,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) %>%
+          mutate(DayGate=factor(paste(Day,Gate,sep="_")),
+                DayCondition=paste(Day,Condition),
+                Experiment=paste(Condition,Rep,sep="_"),
+                Gate=factor(Gate, levels=sorted_gate))
+        genecolData_sub <- as.data.frame(unclass(genecolData_sub))
+           
+        dds_sub <- DESeqDataSetFromMatrix(countData = round(sub_counts),
+                                      colData = genecolData_sub,
+                                      design = ~ Day)
+        
+        dds_sub <- DESeq(dds_sub)
+        
+        vsd_sub <- varianceStabilizingTransformation(dds_sub,blind = FALSE)
+        
+        # Export normalized tables for plotting elsewhere
+        dds_sub_counts <- counts(dds_sub, normalized = TRUE)
+        vsd_sub_data <- assay(vsd_sub)
+        
+        results_sub <- results(dds_sub)
+        
+        ## plot MA custom plot 
+        
+        #plotMA(results_sub,ylim=c(-8,8))
+        
+        # color significant
+        results_sub_plot1 <- results_sub %>%
+          as.data.frame() %>%
+          rownames_to_column("geneid") %>%
+          mutate(color_sig=case_when(padj < 0.1 & padj > 0.01 ~ "under01",
+                                     padj < 0.01 & padj > 0.001 ~ "under001",
+                                     padj < 0.001 & padj >0 ~ "under0001",
+                                     TRUE ~ "over01"))
+        
+        #threshold <- 8
+        plot_ma <-ggplot(results_sub_plot1 %>% as.data.frame(), aes(x=baseMean, y=log2FoldChange, color=color_sig, label=geneid)) +
+            geom_point(size=1) +
+            # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange > threshold,],
+            #           aes(x=baseMean, y=threshold), shape = 2, colour="#d83a00") +
+            # geom_point(data= results_sub_plot1[results_sub_plot1$log2FoldChange < -threshold,],
+            #           aes(x=baseMean, y=-threshold), shape = 2, colour="#d83a00") +
+            #ylim(-threshold,threshold) +
+            scale_x_log10() +
+            scale_color_manual(values = c("gray30","#d83a00","#ff9b76","#ffd4c4")) +
+            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange > 2),
+                    nudge_y = 20,
+                    #nudge_x=-10,
+                    #force_pull   = 10,
+                    force         = 65,
+                    max.overlaps = Inf,
+                    box.padding = 0.5,
+                    segment.color = "grey50",
+                    direction     = "both") +
+            geom_text_repel(data = subset(results_sub_plot1, color_sig=="under0001" & baseMean > 100 & log2FoldChange < -2),
+                    nudge_y = -20,
+                    #nudge_x=-10,
+                    #force_pull   = 10,
+                    force         = 65,
+                    max.overlaps = Inf,
+                    box.padding = 0.5,
+                    segment.color = "grey50",
+                    direction     = "both") +
+            ylab(paste0("log2 Fold Change ",resultsNames(dds_sub)[2]," RNA")) +
+            ggtitle(paste0("Comparison ",samples_wanted[1]," and ",samples_wanted[2],", order ",resultsNames(dds_sub)[2])) +
+            theme_bw() 
+        
+        # print plot
+          ggsave(paste0(workingdir,outdir,"MAplot_",samples_wanted[1]," and ",samples_wanted[2],", order ", resultsNames(dds_sub)[2],".pdf"), plot=plot_ma,
+           width=5, height=3, units="in", useDingbats=FALSE)
+        
+        
+        ## Export files
+        
+        write.table(dds_sub_counts,
+        file = paste0(workingdir,outdir,"CountsNormalized_",samples_wanted[1]," and ",samples_wanted[2],", order ", resultsNames(dds_sub)[2],".txt"),
+            quote = FALSE, row.names = TRUE)
+        write.csv(vsd_sub_data,
+            paste0(workingdir,outdir,"VSData_",samples_wanted[1]," and ",samples_wanted[2],", order ",resultsNames(dds_sub)[2],".csv"),
+            quote = FALSE)
+        write.table(results_sub,
+            file = paste0(workingdir,outdir,"Results_DESeq_",samples_wanted[1]," and ",samples_wanted[2],", order ", resultsNames(dds_sub)[2],".txt"),
+            quote = FALSE, row.names = TRUE)
+
+        # results_return <- results_sub %>% as.data.frame() %>% rownames_to_column("Geneid")
+        # results_return$Comparison <- paste0("Comp_",resultsNames(dds_sub)[2])
+        # results_return
+
+
 ```
 
 
-How many diff acc elements between domains?
 
-```{r }
-
-adjusted_pval = 0.05
-
-log2FC = 1
-
-minBaseMean = 80
-
-```
-
-```{r }
-
-top_domain_comparisons <- results_deseq_domain %>%
-  as.data.frame() %>%
-  filter(padj < adjusted_pval & abs(log2FoldChange) > log2FC & baseMean > minBaseMean)
-
- 
-ggplot(top_domain_comparisons, aes(x=Comparison)) +
-  geom_bar() +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-
+```{r}
+sessionInfo()
 ```
 
 
-Are they the same ones?
-
-```{r }
-
-comparison_vector <- top_domain_comparisons$Comparison %% unique()
-
-list_test <- lapply(comparison_vector, function(x) {
-  top_domain_comparisons[top_domain_comparisons$Comparison==x,"Geneid"]
-})
-names(list_test) <- comparison_vector
-
-#upset(fromList(list_test), sets=comparison_vector, order.by = "degree")
-upset(fromList(list_test), sets=comparison_vector, order.by = "freq")
-```
 
