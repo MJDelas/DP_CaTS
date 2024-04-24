@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```
 
-# ATAC analysis
+# RNA analysis
 Differential accessibility in groups of samples
 
 Generate the comparison and export the data. 
@@ -33,7 +33,7 @@ library(UpSetR)
 ```{r}
 
 workingdir="~/Dropbox (The Francis Crick)/DP_cisReg/"
-subworkinput="outputs_RNApilot_3_diffexpression/"
+subworkinput="outputs_CaTSRNA_3_diffexpression/"
 
 suboutdir1="output_between_gates/"
 suboutdir2="output_between_timepoints/"

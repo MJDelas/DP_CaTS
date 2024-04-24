@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```
 
-# ATAC analysis
+# RNA analysis
 Differential accessibility in groups of samples
 
 Generate the comparison and export the data. 
@@ -51,7 +51,7 @@ Load the diff expression from previous script.
 ## Colors and shapes
 
 ```{r }
-sorted_gate <- c("pMN","DP","p3","neur")
+sorted_gate <- c("pMN","DP","p3","neurons")
 sorted_conditions <- c("500","UPSAG","dRA2UPSAG","dRA")
 
 
@@ -74,9 +74,9 @@ colors_conditions <- c("#e67300","#4d9a00","#cdcd00","#0073e6")
 ## Load vsd to plot heatmaps later
 ```{r load-vsdcounttables}
 
-count_vsd <- read.csv(file=paste0(workingdir,"outputs_RNApilot_1/","featurecounts.vsd.csv"),header=TRUE, stringsAsFactors = FALSE)
+count_vsd <- read.csv(file=paste0(workingdir,"outputs_CaTSRNA_1/","featurecounts.vsd.csv"),header=TRUE, stringsAsFactors = FALSE)
 
-dds_counts <- read.table(file=paste0(workingdir,"outputs_RNApilot_1/","featurecounts.normCounts.txt"),header=TRUE, stringsAsFactors = FALSE)
+dds_counts <- read.table(file=paste0(workingdir,"outputs_CaTSRNA_1/","featurecounts.normCounts.txt"),header=TRUE, stringsAsFactors = FALSE)
 
 ```
 
@@ -191,7 +191,7 @@ gene_subset <- top_domain_comparisons$Geneid %>% unique()
 vsd_hm <- count_vsd %>%
   filter(X %in% gene_subset) %>%
   column_to_rownames("X") %>%
-  select(!contains("_neur_"))
+  select(!contains("neurons"))
 
 dim(vsd_hm)
 

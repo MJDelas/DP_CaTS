@@ -54,6 +54,15 @@ ifelse(!dir.exists(file.path(workingdir,outdir,suboutdir4)), dir.create(file.pat
 ```{r}
 
 count.table <- read.table(paste0(workingdir,subworkinput,"consensus_peaks.mLb.clN.featureCounts.txt"), header = TRUE, sep="\t")
+# clean colnames
+colnames(count.table) <- gsub(".mLb.clN.sorted.bam","",colnames(count.table))
+
+# we do not need coordinates
+count.table <- count.table %>%
+  select("Geneid", starts_with("D"))
+
+
+
 
 ```
 
@@ -96,7 +105,7 @@ This DESeq2 analysis is done by subsetting samples.
 ```{r message = FALSE, warning=FALSE}
 
 count_matrix <- count.table %>%
-  as.data.frame()
+  column_to_rownames("Geneid")
 
 
 #subset 

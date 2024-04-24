@@ -9,12 +9,30 @@ Differential expression between gates, conditions and timepoints
 rm(list=ls())
 
 library(DESeq2)
+```
+
+    ## Warning: package 'matrixStats' was built under R version 4.2.3
+
+``` r
 library(RColorBrewer)
 library(tidyverse)
+```
+
+    ## Warning: package 'tidyr' was built under R version 4.2.3
+
+    ## Warning: package 'readr' was built under R version 4.2.3
+
+    ## Warning: package 'dplyr' was built under R version 4.2.3
+
+    ## Warning: package 'stringr' was built under R version 4.2.3
+
+``` r
 library(ComplexHeatmap)
 library(tximport)
 library(ggrepel)
 ```
+
+    ## Warning: package 'ggrepel' was built under R version 4.2.3
 
 ### Set dirs
 
@@ -60,6 +78,12 @@ ifelse(!dir.exists(file.path(workingdir,outdir,suboutdir4)), dir.create(file.pat
 
 ``` r
 count.table <- read.table(paste0(workingdir,subworkinput,"consensus_peaks.mLb.clN.featureCounts.txt"), header = TRUE, sep="\t")
+# clean colnames
+colnames(count.table) <- gsub(".mLb.clN.sorted.bam","",colnames(count.table))
+
+# we do not need coordinates
+count.table <- count.table %>%
+  select("Geneid", starts_with("D"))
 ```
 
 ## Colors and shapes
@@ -97,7 +121,7 @@ This DESeq2 analysis is done by subsetting samples.
 
 ``` r
 count_matrix <- count.table %>%
-  as.data.frame()
+  column_to_rownames("Geneid")
 
 
 #subset 
@@ -714,58 +738,59 @@ samples_wanted <- c("D7_UPSAG_p3","D5_500_p3")
 sessionInfo()
 ```
 
-    ## R version 4.3.3 (2024-02-29)
+    ## R version 4.2.2 (2022-10-31)
     ## Platform: aarch64-apple-darwin20 (64-bit)
-    ## Running under: macOS Sonoma 14.4.1
+    ## Running under: macOS 14.4.1
     ## 
     ## Matrix products: default
-    ## BLAS:   /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRblas.0.dylib 
-    ## LAPACK: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
+    ## BLAS:   /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRblas.0.dylib
+    ## LAPACK: /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRlapack.dylib
     ## 
     ## locale:
     ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
-    ## 
-    ## time zone: Europe/London
-    ## tzcode source: internal
     ## 
     ## attached base packages:
     ## [1] grid      stats4    stats     graphics  grDevices utils     datasets 
     ## [8] methods   base     
     ## 
     ## other attached packages:
-    ##  [1] ggrepel_0.9.5               tximport_1.30.0            
-    ##  [3] ComplexHeatmap_2.18.0       lubridate_1.9.3            
+    ##  [1] ggrepel_0.9.5               tximport_1.26.1            
+    ##  [3] ComplexHeatmap_2.15.4       lubridate_1.9.3            
     ##  [5] forcats_1.0.0               stringr_1.5.1              
     ##  [7] dplyr_1.1.4                 purrr_1.0.2                
     ##  [9] readr_2.1.5                 tidyr_1.3.1                
-    ## [11] tibble_3.2.1                ggplot2_3.5.0              
+    ## [11] tibble_3.2.1                ggplot2_3.5.1              
     ## [13] tidyverse_2.0.0             RColorBrewer_1.1-3         
-    ## [15] DESeq2_1.42.1               SummarizedExperiment_1.32.0
-    ## [17] Biobase_2.62.0              MatrixGenerics_1.14.0      
-    ## [19] matrixStats_1.2.0           GenomicRanges_1.54.1       
-    ## [21] GenomeInfoDb_1.38.8         IRanges_2.36.0             
-    ## [23] S4Vectors_0.40.2            BiocGenerics_0.48.1        
+    ## [15] DESeq2_1.38.3               SummarizedExperiment_1.28.0
+    ## [17] Biobase_2.58.0              MatrixGenerics_1.10.0      
+    ## [19] matrixStats_1.3.0           GenomicRanges_1.50.2       
+    ## [21] GenomeInfoDb_1.34.9         IRanges_2.32.0             
+    ## [23] S4Vectors_0.36.2            BiocGenerics_0.44.0        
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] tidyselect_1.2.1        farver_2.1.1            bitops_1.0-7           
-    ##  [4] fastmap_1.1.1           RCurl_1.98-1.14         digest_0.6.35          
-    ##  [7] timechange_0.3.0        lifecycle_1.0.4         cluster_2.1.6          
-    ## [10] magrittr_2.0.3          compiler_4.3.3          rlang_1.1.3            
-    ## [13] tools_4.3.3             utf8_1.2.4              yaml_2.3.8             
-    ## [16] knitr_1.45              labeling_0.4.3          S4Arrays_1.2.1         
-    ## [19] DelayedArray_0.28.0     abind_1.4-5             BiocParallel_1.36.0    
-    ## [22] withr_3.0.0             fansi_1.0.6             colorspace_2.1-0       
-    ## [25] scales_1.3.0            iterators_1.0.14        cli_3.6.2              
-    ## [28] rmarkdown_2.26          crayon_1.5.2            ragg_1.3.0             
-    ## [31] generics_0.1.3          rstudioapi_0.16.0       tzdb_0.4.0             
-    ## [34] rjson_0.2.21            zlibbioc_1.48.2         parallel_4.3.3         
-    ## [37] XVector_0.42.0          vctrs_0.6.5             Matrix_1.6-5           
-    ## [40] hms_1.1.3               GetoptLong_1.0.5        clue_0.3-65            
-    ## [43] systemfonts_1.0.6       locfit_1.5-9.9          foreach_1.5.2          
-    ## [46] glue_1.7.0              codetools_0.2-20        stringi_1.8.3          
-    ## [49] gtable_0.3.4            shape_1.4.6.1           munsell_0.5.1          
-    ## [52] pillar_1.9.0            htmltools_0.5.8         GenomeInfoDbData_1.2.11
-    ## [55] circlize_0.4.16         R6_2.5.1                textshaping_0.3.7      
-    ## [58] doParallel_1.0.17       evaluate_0.23           lattice_0.22-6         
-    ## [61] png_0.1-8               Rcpp_1.0.12             SparseArray_1.2.4      
-    ## [64] xfun_0.43               pkgconfig_2.0.3         GlobalOptions_0.1.2
+    ##  [1] bitops_1.0-7           bit64_4.0.5            doParallel_1.0.17     
+    ##  [4] httr_1.4.7             tools_4.2.2            utf8_1.2.4            
+    ##  [7] R6_2.5.1               DBI_1.2.2              colorspace_2.1-0      
+    ## [10] GetoptLong_1.0.5       withr_3.0.0            tidyselect_1.2.1      
+    ## [13] bit_4.0.5              compiler_4.2.2         textshaping_0.3.7     
+    ## [16] cli_3.6.2              DelayedArray_0.24.0    labeling_0.4.3        
+    ## [19] scales_1.3.0           systemfonts_1.0.6      digest_0.6.35         
+    ## [22] rmarkdown_2.26         XVector_0.38.0         pkgconfig_2.0.3       
+    ## [25] htmltools_0.5.8.1      fastmap_1.1.1          rlang_1.1.3           
+    ## [28] GlobalOptions_0.1.2    rstudioapi_0.16.0      RSQLite_2.3.6         
+    ## [31] farver_2.1.1           shape_1.4.6.1          generics_0.1.3        
+    ## [34] BiocParallel_1.32.6    RCurl_1.98-1.14        magrittr_2.0.3        
+    ## [37] GenomeInfoDbData_1.2.9 Matrix_1.6-5           Rcpp_1.0.12           
+    ## [40] munsell_0.5.1          fansi_1.0.6            lifecycle_1.0.4       
+    ## [43] stringi_1.8.3          yaml_2.3.8             zlibbioc_1.44.0       
+    ## [46] blob_1.2.4             parallel_4.2.2         crayon_1.5.2          
+    ## [49] lattice_0.22-6         Biostrings_2.66.0      annotate_1.76.0       
+    ## [52] circlize_0.4.16        hms_1.1.3              KEGGREST_1.38.0       
+    ## [55] locfit_1.5-9.9         knitr_1.46             pillar_1.9.0          
+    ## [58] rjson_0.2.21           geneplotter_1.76.0     codetools_0.2-20      
+    ## [61] XML_3.99-0.16.1        glue_1.7.0             evaluate_0.23         
+    ## [64] png_0.1-8              vctrs_0.6.5            tzdb_0.4.0            
+    ## [67] foreach_1.5.2          gtable_0.3.5           clue_0.3-65           
+    ## [70] cachem_1.0.8           xfun_0.43              xtable_1.8-4          
+    ## [73] ragg_1.3.0             iterators_1.0.14       AnnotationDbi_1.60.2  
+    ## [76] memoise_2.0.1          cluster_2.1.6          timechange_0.3.0

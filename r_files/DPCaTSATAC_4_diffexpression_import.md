@@ -1,7 +1,7 @@
-RNA_4_diffexpression_import
+ATAC_4_diffexpression_import
 ================
 
-# RNA analysis
+# ATAC analysis
 
 Differential accessibility in groups of samples
 
@@ -40,7 +40,7 @@ library(UpSetR)
 
 ``` r
 workingdir="~/Dropbox (The Francis Crick)/DP_cisReg/"
-subworkinput="outputs_CaTSRNA_3_diffexpression/"
+subworkinput="outputs_CaTSATAC_3_diffexpression/"
 
 suboutdir1="output_between_gates/"
 suboutdir2="output_between_timepoints/"
@@ -77,9 +77,9 @@ colors_conditions <- c("#e67300","#4d9a00","#cdcd00","#0073e6")
 ## Load vsd to plot heatmaps later
 
 ``` r
-count_vsd <- read.csv(file=paste0(workingdir,"outputs_CaTSRNA_1/","featurecounts.vsd.csv"),header=TRUE, stringsAsFactors = FALSE)
+count_vsd <- read.csv(file=paste0(workingdir,"outputs_CaTSATAC_1/","featurecounts.vsd.csv"),header=TRUE, stringsAsFactors = FALSE)
 
-dds_counts <- read.table(file=paste0(workingdir,"outputs_CaTSRNA_1/","featurecounts.normCounts.txt"),header=TRUE, stringsAsFactors = FALSE)
+dds_counts <- read.table(file=paste0(workingdir,"outputs_CaTSATAC_1/","featurecounts.normCounts.txt"),header=TRUE, stringsAsFactors = FALSE)
 ```
 
 ## Differential analysis between domains for a given timepoint and condition
@@ -157,7 +157,7 @@ ggplot(top_domain_comparisons, aes(x=Comparison)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
-![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/filter-gates-1.png)<!-- -->
+![](DPCaTSATAC_4_diffexpression_import_files/figure-gfm/filter-gates-1.png)<!-- -->
 
 ### Are they the same ones?
 
@@ -173,7 +173,7 @@ names(list_test) <- comparison_vector
 upset(fromList(list_test), sets=comparison_vector, order.by = "freq")
 ```
 
-![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/domains-overlap-1.png)<!-- -->
+![](DPCaTSATAC_4_diffexpression_import_files/figure-gfm/domains-overlap-1.png)<!-- -->
 
 ### Plot the elements in heatmap to visualize trends?
 
@@ -184,12 +184,12 @@ gene_subset <- top_domain_comparisons$Geneid %>% unique()
 vsd_hm <- count_vsd %>%
   filter(X %in% gene_subset) %>%
   column_to_rownames("X") %>%
-  select(!contains("neurons"))
+  select(!contains("_neur_"))
 
 dim(vsd_hm)
 ```
 
-    ## [1] 468  47
+    ## [1] 14573    60
 
 ``` r
 # z score
@@ -270,6 +270,12 @@ hmap <- Heatmap(vsd_hm_z,
       top_annotation = colAnn)
 ```
 
+    ## `use_raster` is automatically set to TRUE for a matrix with more than
+    ## 2000 rows. You can control `use_raster` argument by explicitly setting
+    ## TRUE/FALSE to it.
+    ## 
+    ## Set `ht_opt$message = FALSE` to turn off this message.
+
 ``` r
 draw(hmap,
     heatmap_legend_side = 'left',
@@ -277,7 +283,7 @@ draw(hmap,
     row_sub_title_side = 'left')
 ```
 
-![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](DPCaTSATAC_4_diffexpression_import_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
 #### Which genes are shared?
 
@@ -289,60 +295,6 @@ top_domain_comparisons[top_domain_comparisons$Comparison=="_UPSAG__D7_Gate_p3_vs
 DP_vs_pMN <- intersect(top_domain_comparisons[top_domain_comparisons$Comparison=="_500__D7_Gate_DP_vs_pMN","Geneid"],
 top_domain_comparisons[top_domain_comparisons$Comparison=="_dRA2UPSAG__D6_Gate_DP_vs_pMN","Geneid"])
 ```
-
-``` r
-dds_counts_plot <- dds_counts %>% 
-  as.data.frame() %>%
-  rownames_to_column("geneid") %>%
-  gather(sampleid, counts_norm, starts_with("D")) %>%
-  separate(sampleid,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) %>%
-  mutate(DayGate=factor(paste(Day,Gate,sep="_")),
-         DayCondition=paste(Day,Condition),
-         Gate=factor(Gate, levels=sorted_gate),
-         Condition=factor(Condition, levels=sorted_conditions))
-
-geneOI <- DP_vs_pMN
-
-ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Day %in% c("D5","D6","D7") & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>% 
-         mutate(geneid=factor(geneid, levels=geneOI)), 
-       aes(x=Day,y=counts_norm)) +
-  stat_summary(aes(fill=Gate),
-    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
-  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
-  #geom_col(position="dodge",aes(fill=DayGate)) +
-  scale_fill_manual(values=color_gates) +
-  scale_color_manual(values=color_gates) +
-  scale_shape_manual(values=shapes4_fill_manual) +
-  facet_grid(geneid ~ Condition, scales = "free_y") +
-  theme_bw()
-```
-
-    ## Warning: No shared levels found between `names(values)` of the manual scale and the
-    ## data's colour values.
-
-![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/plot-genes-2-1.png)<!-- -->
-
-``` r
-geneOI <- p3_vs_DP
-
-ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Day %in% c("D5","D6","D7") & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>% 
-         mutate(geneid=factor(geneid, levels=geneOI)), 
-       aes(x=Day,y=counts_norm)) +
-  stat_summary(aes(fill=Gate),
-    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
-  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
-  #geom_col(position="dodge",aes(fill=DayGate)) +
-  scale_fill_manual(values=color_gates) +
-  scale_color_manual(values=color_gates) +
-  scale_shape_manual(values=shapes4_fill_manual) +
-  facet_grid(geneid ~ Condition, scales = "free_y") +
-  theme_bw()
-```
-
-    ## Warning: No shared levels found between `names(values)` of the manual scale and the
-    ## data's colour values.
-
-![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/plot-genes-1.png)<!-- -->
 
 ### How many diff acc elements between timepoints?
 
@@ -357,7 +309,7 @@ ggplot(top_days_comparisons, aes(x=Comparison)) +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 ```
 
-![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/filter-days-1.png)<!-- -->
+![](DPCaTSATAC_4_diffexpression_import_files/figure-gfm/filter-days-1.png)<!-- -->
 
 ### Are they the same ones?
 
@@ -373,7 +325,7 @@ names(list_test) <- comparison_vector
 upset(fromList(list_test), sets=comparison_vector, order.by = "freq")
 ```
 
-![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/time-overlap-1.png)<!-- -->
+![](DPCaTSATAC_4_diffexpression_import_files/figure-gfm/time-overlap-1.png)<!-- -->
 
 ### Plot the elements in heatmap to visualize trends?
 
@@ -389,7 +341,7 @@ vsd_hm <- count_vsd %>%
 dim(vsd_hm)
 ```
 
-    ## [1] 154  54
+    ## [1] 1666   60
 
 ``` r
 # z score
@@ -475,7 +427,7 @@ draw(hmap,
     row_sub_title_side = 'left')
 ```
 
-![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](DPCaTSATAC_4_diffexpression_import_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ## Plot number of elements changing between domains and over time
 
@@ -506,7 +458,7 @@ ggplot(top_combined_comparsisons %>% filter(condition=="_500"), aes(x=dim1, y=di
   theme_bw()
 ```
 
-![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/plot-fig-numbers-1.png)<!-- -->
+![](DPCaTSATAC_4_diffexpression_import_files/figure-gfm/plot-fig-numbers-1.png)<!-- -->
 
 ``` r
 ggplot(top_combined_comparsisons %>% filter(condition=="_UPSAG"), aes(x=dim1, y=dim2)) +
@@ -518,7 +470,7 @@ ggplot(top_combined_comparsisons %>% filter(condition=="_UPSAG"), aes(x=dim1, y=
   theme_bw()
 ```
 
-![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/plot-fig-numbers-2.png)<!-- -->
+![](DPCaTSATAC_4_diffexpression_import_files/figure-gfm/plot-fig-numbers-2.png)<!-- -->
 
 ``` r
 ggplot(top_combined_comparsisons %>% filter(condition=="_dRA2UPSAG"), aes(x=dim1, y=dim2)) +
@@ -530,7 +482,7 @@ ggplot(top_combined_comparsisons %>% filter(condition=="_dRA2UPSAG"), aes(x=dim1
   theme_bw()
 ```
 
-![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/plot-fig-numbers-3.png)<!-- -->
+![](DPCaTSATAC_4_diffexpression_import_files/figure-gfm/plot-fig-numbers-3.png)<!-- -->
 
 ``` r
 sessionInfo()
