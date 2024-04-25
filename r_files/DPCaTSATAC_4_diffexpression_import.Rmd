@@ -307,7 +307,7 @@ top_domain_comparisons[top_domain_comparisons$Comparison=="_dRA2UPSAG__D6_Gate_D
 
 top_days_comparisons <- results_deseq_days %>%
   as.data.frame() %>%
-  filter(padj < 0.01 & abs(log2FoldChange) > 2 & baseMean > 100)
+  filter(padj < adjusted_pval & abs(log2FoldChange) > log2FC & baseMean > minBaseMean)
 
 
 ggplot(top_days_comparisons, aes(x=Comparison)) +

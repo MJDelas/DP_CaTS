@@ -631,6 +631,11 @@ PairWiseDEseq <-
 
 Compare upsag d7 and 500 d6. Is anything different from 500 d7 vs d6?
 
+
+The most "Foxa2" p3 would be earliest day 500. The most "non-Foxa2" are UPSAG Day 7. But then substract the temporal changes. 
+
+
+
 ```{r message = FALSE, warning=FALSE}
 
 samples_wanted <- c("D7_UPSAG_p3","D5_500_p3")

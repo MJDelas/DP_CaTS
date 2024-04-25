@@ -370,7 +370,7 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Day %in% c("D5","D6","D7"
 ``` r
 top_days_comparisons <- results_deseq_days %>%
   as.data.frame() %>%
-  filter(padj < 0.01 & abs(log2FoldChange) > 2 & baseMean > 100)
+  filter(padj < adjusted_pval & abs(log2FoldChange) > log2FC & baseMean > minBaseMean)
 
 
 ggplot(top_days_comparisons, aes(x=Comparison)) +
@@ -410,7 +410,7 @@ vsd_hm <- count_vsd %>%
 dim(vsd_hm)
 ```
 
-    ## [1] 154  54
+    ## [1] 840  54
 
 ``` r
 # z score
@@ -497,6 +497,68 @@ draw(hmap,
 ```
 
 ![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+
+### Targetted p3 analysis
+
+Compare upsag d7 and 500 d6. Is anything different from 500 d7 vs d6?
+
+The most “Foxa2” p3 would be earliest day 500. The most “non-Foxa2” are
+UPSAG Day 7. But then substract the temporal changes.
+
+``` r
+p3_routes_all <- read.table(paste0(workingdir,subworkinput,"Results_DESeq_D7_UPSAG_p3 and D5_500_p3, order Day_D7_vs_D5.txt")) %>% as.data.frame() %>%
+  rownames_to_column("Geneid")
+
+p3_routes <-  p3_routes_all %>% 
+  filter(padj < adjusted_pval & abs(log2FoldChange) > log2FC & baseMean > log2FC & baseMean > minBaseMean) 
+
+
+# more relaxed time cutoffs
+p3_time <- results_deseq_days %>%
+  as.data.frame() %>%
+  filter(padj < adjusted_pval & abs(log2FoldChange) > 0) %>%
+  filter(Comparison %in% c("_500__p3_Day_D7_vs_D5","_500__p3_Day_D6_vs_D5"))
+
+setdiff(p3_routes$Geneid, p3_time$Geneid)
+```
+
+    ##  [1] "Ackr3"     "Adcy1"     "Amd1"      "Ank"       "Arhgef28"  "Ccdc85c"  
+    ##  [7] "Dab2"      "Epb4.1l4b" "Fam181a"   "Fam43a"    "Ggta1"     "Gusb"     
+    ## [13] "Id1"       "Igsf9"     "Irx1"      "Kdelc2"    "Lemd3"     "Lpp"      
+    ## [19] "Oaz1-ps"   "Phf21b"    "Ptprn2"    "Slc27a4"   "Sox2ot"    "Unc5a"    
+    ## [25] "Vldlr"
+
+``` r
+dim(p3_routes)
+```
+
+    ## [1] 205   7
+
+``` r
+dim(p3_time)
+```
+
+    ## [1] 1142    8
+
+``` r
+geneOI <- setdiff(p3_routes$Geneid, p3_time$Geneid)
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG") & Gate =="p3") %>%
+         filter(Gate !="neur") %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Condition,y=counts_norm)) +
+  stat_summary(aes(fill=Day),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Day), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  #scale_fill_manual(values=color_gates) +
+  #scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_wrap( ~ geneid, scales = "free_y") +
+  theme_bw()
+```
+
+![](DPCaTSRNA_4_diffexpression_import_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ## Plot number of elements changing between domains and over time
 

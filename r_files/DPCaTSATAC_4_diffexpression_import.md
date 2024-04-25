@@ -301,7 +301,7 @@ top_domain_comparisons[top_domain_comparisons$Comparison=="_dRA2UPSAG__D6_Gate_D
 ``` r
 top_days_comparisons <- results_deseq_days %>%
   as.data.frame() %>%
-  filter(padj < 0.01 & abs(log2FoldChange) > 2 & baseMean > 100)
+  filter(padj < adjusted_pval & abs(log2FoldChange) > log2FC & baseMean > minBaseMean)
 
 
 ggplot(top_days_comparisons, aes(x=Comparison)) +
@@ -341,7 +341,7 @@ vsd_hm <- count_vsd %>%
 dim(vsd_hm)
 ```
 
-    ## [1] 1666   60
+    ## [1] 11749    60
 
 ``` r
 # z score
@@ -419,6 +419,12 @@ hmap <- Heatmap(vsd_hm_z,
     # specify top and bottom annotations
       top_annotation = colAnn)
 ```
+
+    ## `use_raster` is automatically set to TRUE for a matrix with more than
+    ## 2000 rows. You can control `use_raster` argument by explicitly setting
+    ## TRUE/FALSE to it.
+    ## 
+    ## Set `ht_opt$message = FALSE` to turn off this message.
 
 ``` r
 draw(hmap,
