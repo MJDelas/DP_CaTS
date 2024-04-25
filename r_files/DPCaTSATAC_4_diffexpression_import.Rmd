@@ -275,7 +275,7 @@ hmap <- Heatmap(vsd_hm_z,
 ```
 
 
-```{r}
+```{r fig.width=8, fig.height=8}
 
 draw(hmap,
     heatmap_legend_side = 'left',
@@ -425,7 +425,7 @@ hmap <- Heatmap(vsd_hm_z,
 ```
 
 
-```{r}
+```{r fig.width=8, fig.height=8}
 
 draw(hmap,
     heatmap_legend_side = 'left',
