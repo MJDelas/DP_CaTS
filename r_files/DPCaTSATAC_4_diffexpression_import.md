@@ -285,16 +285,130 @@ draw(hmap,
 
 ![](DPCaTSATAC_4_diffexpression_import_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
 
-#### Which genes are shared?
+#### DP-specific things?
 
 ``` r
-p3_vs_DP <- intersect(intersect(top_domain_comparisons[top_domain_comparisons$Comparison=="_500__D7_Gate_p3_vs_DP","Geneid"],
-top_domain_comparisons[top_domain_comparisons$Comparison=="_dRA2UPSAG__D6_Gate_p3_vs_DP","Geneid"]),
-top_domain_comparisons[top_domain_comparisons$Comparison=="_UPSAG__D7_Gate_p3_vs_DP","Geneid"])
+generous_domain_comparisons <- results_deseq_domain %>%
+  as.data.frame() %>%
+  filter(padj < adjusted_pval & abs(log2FoldChange) > 0 & baseMean > minBaseMean)
 
-DP_vs_pMN <- intersect(top_domain_comparisons[top_domain_comparisons$Comparison=="_500__D7_Gate_DP_vs_pMN","Geneid"],
-top_domain_comparisons[top_domain_comparisons$Comparison=="_dRA2UPSAG__D6_Gate_DP_vs_pMN","Geneid"])
+
+p3_vs_DP <- union(generous_domain_comparisons[generous_domain_comparisons$Comparison=="_500__D7_Gate_p3_vs_DP","Geneid"],
+generous_domain_comparisons[generous_domain_comparisons$Comparison=="_500__D6_Gate_p3_vs_DP","Geneid"])
+
+DP_vs_pMN <- union(generous_domain_comparisons[generous_domain_comparisons$Comparison=="_500__D7_Gate_DP_vs_pMN","Geneid"],
+generous_domain_comparisons[generous_domain_comparisons$Comparison=="_500__D6_Gate_DP_vs_pMN","Geneid"])
 ```
+
+``` r
+gene_subset <- intersect(p3_vs_DP,DP_vs_pMN)
+
+# filter elements
+vsd_hm <- count_vsd %>%
+  filter(X %in% gene_subset) %>%
+  column_to_rownames("X") %>%
+  select(!contains("_neur_"))
+
+dim(vsd_hm)
+```
+
+    ## [1] 2477   60
+
+``` r
+# z score
+vsd_hm_z <- t(scale(t(vsd_hm))) 
+
+
+names(color_gates) <- sorted_gate
+names(colors_conditions) <- sorted_conditions
+
+# metadata for the heatmap
+genecolData_first <- data.frame(Sample_ID = colnames(vsd_hm))
+
+genecolData_first <- genecolData_first %>% 
+  separate(Sample_ID,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) 
+
+genecolData_first <- as.data.frame(unclass(genecolData_first))
+
+phen_data <- genecolData_first %>%
+  select(c("Sample_ID","Day","Condition","Gate")) %>%
+  remove_rownames() %>%
+  column_to_rownames("Sample_ID")
+ann_color_JD <- list(Gate=color_gates, Condition=colors_conditions,
+    Day = c(D5="#f6f6f6",D6="#808080",D7="#333333"))
+
+# Annotated heatmap with selected colors
+hm_colors = colorRampPalette(rev(brewer.pal(n = 11, name = "RdBu")))(100)
+
+
+# Build the annotation for the complex heatmap
+colAnn <- HeatmapAnnotation(
+    df = phen_data,
+    which = 'col', # 'col' (samples) or 'row' (gene) annotation?
+    na_col = 'white', # default colour for any NA values in the annotation data-frame, 'ann'
+    col = ann_color_JD,
+    annotation_height = 0.6,
+    annotation_width = unit(1, 'cm'),
+    gap = unit(1, 'mm'))
+
+
+
+hmap <- Heatmap(vsd_hm_z,
+
+    name = 'Z-score',
+
+    col = hm_colors,
+
+    # row (gene) parameters
+      cluster_rows = TRUE,
+      show_row_dend = TRUE,
+      #row_title = 'Statistically significant genes',
+      row_title_side = 'left',
+      row_title_gp = gpar(fontsize = 12,  fontface = 'bold'),
+      row_title_rot = 90,
+      show_row_names = FALSE,
+      row_names_gp = gpar(fontsize = 10, fontface = 'bold'),
+      row_names_side = 'left',
+      row_dend_width = unit(25,'mm'),
+
+    # column (sample) parameters
+      cluster_columns = TRUE,
+      show_column_dend = TRUE,
+      column_title = '',
+      column_title_side = 'bottom',
+      column_title_gp = gpar(fontsize = 12, fontface = 'bold'),
+      column_title_rot = 0,
+      show_column_names = TRUE,
+      column_names_gp = gpar(fontsize = 8),
+      column_names_max_height = unit(10, 'cm'),
+      column_dend_height = unit(25,'mm'),
+
+    # cluster methods for rows and columns
+      clustering_distance_columns = function(x) as.dist(1 - cor(t(x))),
+      clustering_method_columns = 'ward.D2',
+      clustering_distance_rows = function(x) as.dist(1 - cor(t(x))),
+      clustering_method_rows = 'ward.D2',
+
+    # specify top and bottom annotations
+      top_annotation = colAnn)
+```
+
+    ## `use_raster` is automatically set to TRUE for a matrix with more than
+    ## 2000 rows. You can control `use_raster` argument by explicitly setting
+    ## TRUE/FALSE to it.
+    ## 
+    ## Set `ht_opt$message = FALSE` to turn off this message.
+
+Even when looking for DP specific things… very hard.
+
+``` r
+draw(hmap,
+    heatmap_legend_side = 'left',
+    annotation_legend_side = 'left',
+    row_sub_title_side = 'left')
+```
+
+![](DPCaTSATAC_4_diffexpression_import_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ### How many diff acc elements between timepoints?
 
@@ -433,7 +547,7 @@ draw(hmap,
     row_sub_title_side = 'left')
 ```
 
-![](DPCaTSATAC_4_diffexpression_import_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](DPCaTSATAC_4_diffexpression_import_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ## Plot number of elements changing between domains and over time
 

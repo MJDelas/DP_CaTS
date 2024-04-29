@@ -285,7 +285,7 @@ draw(hmap,
 ```
 
 
-#### Which genes are shared?
+#### DP-specific things?
 
 
 ```{r findgenes-domains}
