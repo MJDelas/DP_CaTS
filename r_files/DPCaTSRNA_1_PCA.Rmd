@@ -158,15 +158,7 @@ vsd <- varianceStabilizingTransformation(dds,blind = FALSE)
 
 # Export normalized tables for plotting elsewhere
 dds_counts <- counts(dds, normalized = TRUE)
-vsd_data_unfiltered <- assay(vsd)
-
-```
-
-
-Removing Outliers
-```{r}
-
-vsd_data <- subset(vsd_data_unfiltered, select = -D6_UPSAG_pMN_R2)
+vsd_data <- assay(vsd)
 
 ```
 
@@ -349,8 +341,8 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
 
 
 
-# Correlation Heatmaps - based on 500 top genes 
-```{r fig.width=11,fig.height=11, eval=FALSE, include=FALSE}
+## Correlation Heatmaps - based on 500 top genes 
+```{r fig.width=11,fig.height=11}
 
 cor_vsd <-cor( vsd_data[select,] )
 
@@ -358,7 +350,7 @@ names(color_gates) <- sorted_gate
 names(colors_conditions) <- sorted_conditions
 
 phen_data <- genecolData_first %>%
-  select(c("Sample_ID","Day","Condition","Gate","Rep")) %>%
+  select(c("Sample_ID","Day","Condition","Gate")) %>%
   remove_rownames() %>%
   column_to_rownames("Sample_ID")
 ann_color_JD <- list(Gate=color_gates, Condition=colors_conditions,
@@ -705,6 +697,162 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
 
 
 ```
+
+
+```{r fig.width=11,fig.height=11}
+
+cor_vsd <-cor( vsd_data[select,] )
+
+names(color_gates) <- sorted_gate
+names(colors_conditions) <- sorted_conditions
+
+phen_data <- genecolData_first %>%
+  select(c("Sample_ID","Day","Condition","Gate")) %>%
+  remove_rownames() %>%
+  column_to_rownames("Sample_ID")
+ann_color_JD <- list(Gate=color_gates, Condition=colors_conditions,
+    Day = c(D5="#f6f6f6",D6="#808080",D7="#333333"),
+  Rep = c(R1="#ebeb77", R2="#77b1eb"))
+
+
+# Build the annotation for the complex heatmap
+heatmap_ann_row <- rowAnnotation(df=phen_data, col=ann_color_JD)
+heatmap_ann <- HeatmapAnnotation(df=phen_data, col=ann_color_JD, show_legend = FALSE)
+
+
+
+# Annotated heatmap with selected colors
+hm_colors = colorRampPalette(rev(brewer.pal(n = 11, name = "RdBu")))(100)
+
+
+Heatmap(cor_vsd, name="Correlation", col=hm_colors,
+        cluster_columns = TRUE, cluster_rows = TRUE,
+        #show_column_dend = FALSE,
+        #row_dend_side = "right", column_dend_side = "bottom",
+        # cluster methods for rows and columns
+        clustering_distance_columns = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_columns = 'ward.D2',
+        clustering_distance_rows = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_rows = 'ward.D2',
+        column_dend_height = unit(2, "cm"), row_dend_width = unit(2, "cm"),
+        row_names_gp = gpar(fontsize = 10),column_names_gp = gpar(fontsize = 10),
+        left_annotation = heatmap_ann_row, top_annotation = heatmap_ann,
+        column_title = "Pearson Correlation - Top 500 genes")
+
+
+
+```
+
+### for poster: simple corr heatmap
+ Analysis without neurons
+
+```{r}
+
+gates=c("_pMN_","_p3_","_DP_")
+conditions=c("_500_","_dRA2UPSAG_")
+
+sub_counts <- count.table %>% 
+  as.data.frame() %>%
+  dplyr::select(contains(gates)) %>%
+  dplyr::select(contains(conditions))
+
+## Make metadata file for DESeq
+
+genecolData_first <- data.frame(Sample_ID = colnames(sub_counts))
+
+genecolData_first <- genecolData_first %>% 
+  separate(Sample_ID,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) 
+
+genecolData_first <- as.data.frame(unclass(genecolData_first))
+
+
+dds <- DESeqDataSetFromMatrix(countData =  round(sub_counts),
+                                  colData = genecolData_first,
+                                  design = ~ Gate)
+dds <- DESeq(dds)
+
+vsd <- varianceStabilizingTransformation(dds,blind = FALSE)
+
+# Export normalized tables for plotting elsewhere
+dds_counts <- counts(dds, normalized = TRUE)
+vsd_data <- assay(vsd)
+
+```
+
+## Plot PCAs 
+
+```{r }
+## to get more than 2 components
+
+## to go it in the top ntop variable genes 
+# calculate the variance for each gene
+rv <- rowVars(vsd_data, useNames = TRUE)
+# select the ntop genes by variance
+ntop=500
+select <- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
+
+#pca <- prcomp(t(assay(object)[select,]))
+t_vsd <- t(vsd_data[select,])
+vsd_pca <- prcomp(t_vsd, retx=TRUE, scale. = FALSE)
+
+names(vsd_pca)
+
+# How many PC to explain enough variance?
+#summary(vsd_pca)
+
+var_explained <-vsd_pca$sdev^2/sum(vsd_pca$sdev^2)
+plot(var_explained)
+
+```
+
+
+```{r fig.width=11,fig.height=11}
+
+
+
+cor_vsd <-cor( vsd_data[select,] )
+
+names(color_gates) <- sorted_gate
+names(colors_conditions) <- sorted_conditions
+
+phen_data <- genecolData_first %>%
+  select(c("Sample_ID","Day","Condition","Gate")) %>%
+  remove_rownames() %>%
+  column_to_rownames("Sample_ID")
+ann_color_JD <- list(Gate=color_gates, Condition=colors_conditions,
+    Day = c(D5="#f6f6f6",D6="#808080",D7="#333333"),
+  Rep = c(R1="#ebeb77", R2="#77b1eb"))
+
+
+# Build the annotation for the complex heatmap
+heatmap_ann_row <- rowAnnotation(df=phen_data, col=ann_color_JD)
+heatmap_ann <- HeatmapAnnotation(df=phen_data, col=ann_color_JD, show_legend = FALSE)
+
+
+
+# Annotated heatmap with selected colors
+hm_colors = colorRampPalette(rev(brewer.pal(n = 11, name = "RdBu")))(100)
+
+
+Heatmap(cor_vsd, name="Correlation", col=hm_colors,
+        cluster_columns = TRUE, cluster_rows = TRUE,
+        show_column_dend = TRUE,
+        #row_dend_side = "right", column_dend_side = "bottom",
+        # cluster methods for rows and columns
+        clustering_distance_columns = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_columns = 'ward.D2',
+        clustering_distance_rows = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_rows = 'ward.D2',
+        column_dend_height = unit(2, "cm"), row_dend_width = unit(2, "cm"),
+        row_names_gp = gpar(fontsize = 10),column_names_gp = gpar(fontsize = 10),
+        left_annotation = heatmap_ann_row, top_annotation = heatmap_ann,
+        column_title = "Pearson Correlation - Top 500 genes")
+
+
+
+```
+
+
 
 
 ```{r}

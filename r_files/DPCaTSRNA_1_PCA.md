@@ -9,8 +9,24 @@ Re-analysis after nf-core/rnaseq 3.5
 rm(list=ls())
 
 library(DESeq2)
+```
+
+    ## Warning: package 'matrixStats' was built under R version 4.2.3
+
+``` r
 library(RColorBrewer)
 library(tidyverse)
+```
+
+    ## Warning: package 'tidyr' was built under R version 4.2.3
+
+    ## Warning: package 'readr' was built under R version 4.2.3
+
+    ## Warning: package 'dplyr' was built under R version 4.2.3
+
+    ## Warning: package 'stringr' was built under R version 4.2.3
+
+``` r
 library(ComplexHeatmap)
 library(tximport)
 ```
@@ -65,7 +81,7 @@ txi.salmon <- tximport(files, type = "salmon", tx2gene = tx2gene)
 ```
 
     ## reading in files with read_tsv
-    ## 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 
+    ## 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 
     ## transcripts missing from tx2gene: 1
     ## summarizing abundance
     ## summarizing counts
@@ -191,13 +207,7 @@ vsd <- varianceStabilizingTransformation(dds,blind = FALSE)
 
 # Export normalized tables for plotting elsewhere
 dds_counts <- counts(dds, normalized = TRUE)
-vsd_data_unfiltered <- assay(vsd)
-```
-
-Removing Outliers
-
-``` r
-vsd_data <- subset(vsd_data_unfiltered, select = -D6_UPSAG_pMN_R2)
+vsd_data <- assay(vsd)
 ```
 
 ## Plot PCAs
@@ -207,7 +217,7 @@ vsd_data <- subset(vsd_data_unfiltered, select = -D6_UPSAG_pMN_R2)
 
 ## to go it in the top ntop variable genes 
 # calculate the variance for each gene
-rv <- rowVars(vsd_data)
+rv <- rowVars(vsd_data, useNames = TRUE)
 # select the ntop genes by variance
 ntop=500
 select <- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
@@ -229,7 +239,7 @@ var_explained <-vsd_pca$sdev^2/sum(vsd_pca$sdev^2)
 plot(var_explained)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
 vsd_pca_plot <- vsd_pca$x %>% 
@@ -251,7 +261,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Day,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Day)) +
@@ -264,7 +274,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Day)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Condition,shape=Gate)) +
@@ -277,7 +287,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Condition,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-3.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-3.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
@@ -290,7 +300,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-4.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-4.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayGate,shape=Condition)) +
@@ -302,7 +312,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayGate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-5.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-5.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayCondition,shape=Gate)) +
@@ -314,7 +324,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayCondition,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-6.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-6.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
@@ -327,7 +337,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-7.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-8-7.png)<!-- -->
 
 ## Plot more components
 
@@ -341,7 +351,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
@@ -354,7 +364,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-2.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
@@ -367,7 +377,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-3.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-3.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
@@ -380,7 +390,7 @@ ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-4.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-4.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
@@ -393,7 +403,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-5.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-5.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
@@ -406,7 +416,7 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-6.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-6.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) +
@@ -419,9 +429,51 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-7.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-9-7.png)<!-- -->
 
-# Correlation Heatmaps - based on 500 top genes
+## Correlation Heatmaps - based on 500 top genes
+
+``` r
+cor_vsd <-cor( vsd_data[select,] )
+
+names(color_gates) <- sorted_gate
+names(colors_conditions) <- sorted_conditions
+
+phen_data <- genecolData_first %>%
+  select(c("Sample_ID","Day","Condition","Gate")) %>%
+  remove_rownames() %>%
+  column_to_rownames("Sample_ID")
+ann_color_JD <- list(Gate=color_gates, Condition=colors_conditions,
+    Day = c(D5="#f6f6f6",D6="#808080",D7="#333333"),
+  Rep = c(R1="#ebeb77", R2="#77b1eb"))
+
+
+# Build the annotation for the complex heatmap
+heatmap_ann_row <- rowAnnotation(df=phen_data, col=ann_color_JD)
+heatmap_ann <- HeatmapAnnotation(df=phen_data, col=ann_color_JD, show_legend = FALSE)
+
+
+
+# Annotated heatmap with selected colors
+hm_colors = colorRampPalette(rev(brewer.pal(n = 11, name = "RdBu")))(100)
+
+
+Heatmap(cor_vsd, name="Correlation", col=hm_colors,
+        cluster_columns = TRUE, cluster_rows = TRUE,
+        #show_column_dend = FALSE,
+        #row_dend_side = "right", column_dend_side = "bottom",
+        # cluster methods for rows and columns
+        clustering_distance_columns = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_columns = 'ward.D2',
+        clustering_distance_rows = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_rows = 'ward.D2',
+        column_dend_height = unit(2, "cm"), row_dend_width = unit(2, "cm"),
+        row_names_gp = gpar(fontsize = 10),column_names_gp = gpar(fontsize = 10),
+        left_annotation = heatmap_ann_row, top_annotation = heatmap_ann,
+        column_title = "Pearson Correlation - Top 500 genes")
+```
+
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ## Export files
 
@@ -465,7 +517,10 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(g
   theme_bw()
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+    ## Warning: No shared levels found between `names(values)` of the manual scale and the
+    ## data's colour values.
+
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
 
 ``` r
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(geneid, levels=geneOI)), 
@@ -481,7 +536,10 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>% mutate(geneid=factor(g
   theme_bw()
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->
+    ## Warning: No shared levels found between `names(values)` of the manual scale and the
+    ## data's colour values.
+
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
 
 ``` r
 geneOI_2 <- c("Nkx2-9","Nkx6-1","Foxa1","Phox2b","Neurog3","Uncx","Lhx1","Mnr2")
@@ -500,7 +558,10 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI_2) %>% mutate(geneid=factor
   theme_bw()
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
+    ## Warning: No shared levels found between `names(values)` of the manual scale and the
+    ## data's colour values.
+
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
 
 # RA Response Genes
 
@@ -521,7 +582,10 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI_RAR) %>% mutate(geneid=fact
   theme_bw()
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+    ## Warning: No shared levels found between `names(values)` of the manual scale and the
+    ## data's colour values.
+
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
 
 # Analysis without neurons
 
@@ -568,7 +632,7 @@ dds <- DESeq(dds)
 
     ## fitting model and testing
 
-    ## -- replacing outliers and refitting for 68 genes
+    ## -- replacing outliers and refitting for 17 genes
     ## -- DESeq argument 'minReplicatesForReplace' = 7 
     ## -- original counts are preserved in counts(dds)
 
@@ -591,7 +655,7 @@ vsd_data <- assay(vsd)
 
 ## to go it in the top ntop variable genes 
 # calculate the variance for each gene
-rv <- rowVars(vsd_data)
+rv <- rowVars(vsd_data, useNames = TRUE)
 # select the ntop genes by variance
 ntop=500
 select <- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
@@ -613,7 +677,7 @@ var_explained <-vsd_pca$sdev^2/sum(vsd_pca$sdev^2)
 plot(var_explained)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
 
 ``` r
 vsd_pca_plot <- vsd_pca$x %>% 
@@ -635,7 +699,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Day,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Day)) +
@@ -648,7 +712,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Day)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-2.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Condition,shape=Gate)) +
@@ -661,7 +725,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Condition,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-3.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-3.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
@@ -674,7 +738,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-4.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-4.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayGate,shape=Condition)) +
@@ -686,7 +750,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayGate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-5.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-5.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayCondition,shape=Gate)) +
@@ -698,7 +762,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=DayCondition,shape=Gate)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-6.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-6.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
@@ -711,7 +775,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Rep)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-7.png)<!-- --> \##
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-18-7.png)<!-- --> \##
 More components
 
 ``` r
@@ -724,7 +788,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC2,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
@@ -737,7 +801,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-2.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-2.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
@@ -750,7 +814,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Day,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-3.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-3.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
@@ -763,7 +827,7 @@ ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-4.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-4.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition,label=Sample)) +
@@ -777,7 +841,7 @@ ggplot(vsd_pca_plot, aes(x=PC2,y=PC3,fill=Gate,shape=Condition,label=Sample)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-5.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-5.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
@@ -790,7 +854,7 @@ ggplot(vsd_pca_plot, aes(x=PC1,y=PC3,fill=Rep,shape=Gate, label=Condition)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-6.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-6.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
@@ -803,7 +867,7 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC2,fill=Condition,shape=Day)) +
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-7.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-7.png)<!-- -->
 
 ``` r
 ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) +
@@ -816,65 +880,246 @@ ggplot(vsd_pca_plot, aes(x=PC4,y=PC5,fill=DayCondition,shape=Gate, label=Gate)) 
   theme_bw(base_size=16)
 ```
 
-![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-8.png)<!-- -->
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-19-8.png)<!-- -->
+
+``` r
+cor_vsd <-cor( vsd_data[select,] )
+
+names(color_gates) <- sorted_gate
+names(colors_conditions) <- sorted_conditions
+
+phen_data <- genecolData_first %>%
+  select(c("Sample_ID","Day","Condition","Gate")) %>%
+  remove_rownames() %>%
+  column_to_rownames("Sample_ID")
+ann_color_JD <- list(Gate=color_gates, Condition=colors_conditions,
+    Day = c(D5="#f6f6f6",D6="#808080",D7="#333333"),
+  Rep = c(R1="#ebeb77", R2="#77b1eb"))
+
+
+# Build the annotation for the complex heatmap
+heatmap_ann_row <- rowAnnotation(df=phen_data, col=ann_color_JD)
+heatmap_ann <- HeatmapAnnotation(df=phen_data, col=ann_color_JD, show_legend = FALSE)
+
+
+
+# Annotated heatmap with selected colors
+hm_colors = colorRampPalette(rev(brewer.pal(n = 11, name = "RdBu")))(100)
+
+
+Heatmap(cor_vsd, name="Correlation", col=hm_colors,
+        cluster_columns = TRUE, cluster_rows = TRUE,
+        #show_column_dend = FALSE,
+        #row_dend_side = "right", column_dend_side = "bottom",
+        # cluster methods for rows and columns
+        clustering_distance_columns = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_columns = 'ward.D2',
+        clustering_distance_rows = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_rows = 'ward.D2',
+        column_dend_height = unit(2, "cm"), row_dend_width = unit(2, "cm"),
+        row_names_gp = gpar(fontsize = 10),column_names_gp = gpar(fontsize = 10),
+        left_annotation = heatmap_ann_row, top_annotation = heatmap_ann,
+        column_title = "Pearson Correlation - Top 500 genes")
+```
+
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-20-1.png)<!-- -->
+
+### for poster: simple corr heatmap
+
+Analysis without neurons
+
+``` r
+gates=c("_pMN_","_p3_","_DP_")
+conditions=c("_500_","_dRA2UPSAG_")
+
+sub_counts <- count.table %>% 
+  as.data.frame() %>%
+  dplyr::select(contains(gates)) %>%
+  dplyr::select(contains(conditions))
+
+## Make metadata file for DESeq
+
+genecolData_first <- data.frame(Sample_ID = colnames(sub_counts))
+
+genecolData_first <- genecolData_first %>% 
+  separate(Sample_ID,into=c("Day","Condition","Gate","Rep"), sep="_", remove=FALSE) 
+
+genecolData_first <- as.data.frame(unclass(genecolData_first))
+
+
+dds <- DESeqDataSetFromMatrix(countData =  round(sub_counts),
+                                  colData = genecolData_first,
+                                  design = ~ Gate)
+```
+
+    ## converting counts to integer mode
+
+    ## Warning in DESeqDataSet(se, design = design, ignoreRank): some variables in
+    ## design formula are characters, converting to factors
+
+``` r
+dds <- DESeq(dds)
+```
+
+    ## estimating size factors
+
+    ## estimating dispersions
+
+    ## gene-wise dispersion estimates
+
+    ## mean-dispersion relationship
+
+    ## final dispersion estimates
+
+    ## fitting model and testing
+
+    ## -- replacing outliers and refitting for 9 genes
+    ## -- DESeq argument 'minReplicatesForReplace' = 7 
+    ## -- original counts are preserved in counts(dds)
+
+    ## estimating dispersions
+
+    ## fitting model and testing
+
+``` r
+vsd <- varianceStabilizingTransformation(dds,blind = FALSE)
+
+# Export normalized tables for plotting elsewhere
+dds_counts <- counts(dds, normalized = TRUE)
+vsd_data <- assay(vsd)
+```
+
+## Plot PCAs
+
+``` r
+## to get more than 2 components
+
+## to go it in the top ntop variable genes 
+# calculate the variance for each gene
+rv <- rowVars(vsd_data, useNames = TRUE)
+# select the ntop genes by variance
+ntop=500
+select <- order(rv, decreasing=TRUE)[seq_len(min(ntop, length(rv)))]
+
+#pca <- prcomp(t(assay(object)[select,]))
+t_vsd <- t(vsd_data[select,])
+vsd_pca <- prcomp(t_vsd, retx=TRUE, scale. = FALSE)
+
+names(vsd_pca)
+```
+
+    ## [1] "sdev"     "rotation" "center"   "scale"    "x"
+
+``` r
+# How many PC to explain enough variance?
+#summary(vsd_pca)
+
+var_explained <-vsd_pca$sdev^2/sum(vsd_pca$sdev^2)
+plot(var_explained)
+```
+
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-22-1.png)<!-- -->
+
+``` r
+cor_vsd <-cor( vsd_data[select,] )
+
+names(color_gates) <- sorted_gate
+names(colors_conditions) <- sorted_conditions
+
+phen_data <- genecolData_first %>%
+  select(c("Sample_ID","Day","Condition","Gate")) %>%
+  remove_rownames() %>%
+  column_to_rownames("Sample_ID")
+ann_color_JD <- list(Gate=color_gates, Condition=colors_conditions,
+    Day = c(D5="#f6f6f6",D6="#808080",D7="#333333"),
+  Rep = c(R1="#ebeb77", R2="#77b1eb"))
+
+
+# Build the annotation for the complex heatmap
+heatmap_ann_row <- rowAnnotation(df=phen_data, col=ann_color_JD)
+heatmap_ann <- HeatmapAnnotation(df=phen_data, col=ann_color_JD, show_legend = FALSE)
+
+
+
+# Annotated heatmap with selected colors
+hm_colors = colorRampPalette(rev(brewer.pal(n = 11, name = "RdBu")))(100)
+
+
+Heatmap(cor_vsd, name="Correlation", col=hm_colors,
+        cluster_columns = TRUE, cluster_rows = TRUE,
+        show_column_dend = TRUE,
+        #row_dend_side = "right", column_dend_side = "bottom",
+        # cluster methods for rows and columns
+        clustering_distance_columns = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_columns = 'ward.D2',
+        clustering_distance_rows = function(x) as.dist(1 - cor(t(x))),
+        clustering_method_rows = 'ward.D2',
+        column_dend_height = unit(2, "cm"), row_dend_width = unit(2, "cm"),
+        row_names_gp = gpar(fontsize = 10),column_names_gp = gpar(fontsize = 10),
+        left_annotation = heatmap_ann_row, top_annotation = heatmap_ann,
+        column_title = "Pearson Correlation - Top 500 genes")
+```
+
+![](DPCaTSRNA_1_PCA_files/figure-gfm/unnamed-chunk-23-1.png)<!-- -->
 
 ``` r
 sessionInfo()
 ```
 
-    ## R version 4.3.3 (2024-02-29)
+    ## R version 4.2.2 (2022-10-31)
     ## Platform: aarch64-apple-darwin20 (64-bit)
-    ## Running under: macOS Sonoma 14.4.1
+    ## Running under: macOS 14.4.1
     ## 
     ## Matrix products: default
-    ## BLAS:   /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRblas.0.dylib 
-    ## LAPACK: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
+    ## BLAS:   /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRblas.0.dylib
+    ## LAPACK: /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRlapack.dylib
     ## 
     ## locale:
     ## [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
-    ## 
-    ## time zone: Europe/London
-    ## tzcode source: internal
     ## 
     ## attached base packages:
     ## [1] grid      stats4    stats     graphics  grDevices utils     datasets 
     ## [8] methods   base     
     ## 
     ## other attached packages:
-    ##  [1] tximport_1.30.0             ComplexHeatmap_2.18.0      
+    ##  [1] tximport_1.26.1             ComplexHeatmap_2.15.4      
     ##  [3] lubridate_1.9.3             forcats_1.0.0              
     ##  [5] stringr_1.5.1               dplyr_1.1.4                
     ##  [7] purrr_1.0.2                 readr_2.1.5                
     ##  [9] tidyr_1.3.1                 tibble_3.2.1               
-    ## [11] ggplot2_3.5.0               tidyverse_2.0.0            
-    ## [13] RColorBrewer_1.1-3          DESeq2_1.42.1              
-    ## [15] SummarizedExperiment_1.32.0 Biobase_2.62.0             
-    ## [17] MatrixGenerics_1.14.0       matrixStats_1.2.0          
-    ## [19] GenomicRanges_1.54.1        GenomeInfoDb_1.38.8        
-    ## [21] IRanges_2.36.0              S4Vectors_0.40.2           
-    ## [23] BiocGenerics_0.48.1        
+    ## [11] ggplot2_3.5.1               tidyverse_2.0.0            
+    ## [13] RColorBrewer_1.1-3          DESeq2_1.38.3              
+    ## [15] SummarizedExperiment_1.28.0 Biobase_2.58.0             
+    ## [17] MatrixGenerics_1.10.0       matrixStats_1.3.0          
+    ## [19] GenomicRanges_1.50.2        GenomeInfoDb_1.34.9        
+    ## [21] IRanges_2.32.0              S4Vectors_0.36.2           
+    ## [23] BiocGenerics_0.44.0        
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] tidyselect_1.2.1        farver_2.1.1            bitops_1.0-7           
-    ##  [4] fastmap_1.1.1           RCurl_1.98-1.14         digest_0.6.35          
-    ##  [7] timechange_0.3.0        lifecycle_1.0.4         cluster_2.1.6          
-    ## [10] magrittr_2.0.3          compiler_4.3.3          rlang_1.1.3            
-    ## [13] tools_4.3.3             utf8_1.2.4              yaml_2.3.8             
-    ## [16] knitr_1.45              labeling_0.4.3          S4Arrays_1.2.1         
-    ## [19] bit_4.0.5               DelayedArray_0.28.0     abind_1.4-5            
-    ## [22] BiocParallel_1.36.0     withr_3.0.0             fansi_1.0.6            
-    ## [25] colorspace_2.1-0        scales_1.3.0            iterators_1.0.14       
-    ## [28] cli_3.6.2               rmarkdown_2.26          crayon_1.5.2           
-    ## [31] generics_0.1.3          rstudioapi_0.16.0       tzdb_0.4.0             
-    ## [34] rjson_0.2.21            zlibbioc_1.48.2         parallel_4.3.3         
-    ## [37] XVector_0.42.0          vctrs_0.6.5             Matrix_1.6-5           
-    ## [40] jsonlite_1.8.8          hms_1.1.3               GetoptLong_1.0.5       
-    ## [43] bit64_4.0.5             clue_0.3-65             locfit_1.5-9.9         
-    ## [46] foreach_1.5.2           glue_1.7.0              codetools_0.2-20       
-    ## [49] stringi_1.8.3           gtable_0.3.4            shape_1.4.6.1          
-    ## [52] munsell_0.5.1           pillar_1.9.0            htmltools_0.5.8        
-    ## [55] GenomeInfoDbData_1.2.11 circlize_0.4.16         R6_2.5.1               
-    ## [58] doParallel_1.0.17       vroom_1.6.5             evaluate_0.23          
-    ## [61] lattice_0.22-6          highr_0.10              png_0.1-8              
-    ## [64] Rcpp_1.0.12             SparseArray_1.2.4       xfun_0.43              
-    ## [67] pkgconfig_2.0.3         GlobalOptions_0.1.2
+    ##  [1] bitops_1.0-7           bit64_4.0.5            doParallel_1.0.17     
+    ##  [4] httr_1.4.7             tools_4.2.2            utf8_1.2.4            
+    ##  [7] R6_2.5.1               DBI_1.2.2              colorspace_2.1-0      
+    ## [10] GetoptLong_1.0.5       withr_3.0.0            tidyselect_1.2.1      
+    ## [13] bit_4.0.5              compiler_4.2.2         cli_3.6.2             
+    ## [16] Cairo_1.6-2            DelayedArray_0.24.0    labeling_0.4.3        
+    ## [19] scales_1.3.0           digest_0.6.35          rmarkdown_2.26        
+    ## [22] XVector_0.38.0         pkgconfig_2.0.3        htmltools_0.5.8.1     
+    ## [25] highr_0.10             fastmap_1.1.1          rlang_1.1.3           
+    ## [28] GlobalOptions_0.1.2    rstudioapi_0.16.0      RSQLite_2.3.6         
+    ## [31] farver_2.1.1           shape_1.4.6.1          generics_0.1.3        
+    ## [34] jsonlite_1.8.8         vroom_1.6.5            BiocParallel_1.32.6   
+    ## [37] RCurl_1.98-1.14        magrittr_2.0.3         GenomeInfoDbData_1.2.9
+    ## [40] Matrix_1.6-5           Rcpp_1.0.12            munsell_0.5.1         
+    ## [43] fansi_1.0.6            lifecycle_1.0.4        stringi_1.8.3         
+    ## [46] yaml_2.3.8             zlibbioc_1.44.0        blob_1.2.4            
+    ## [49] parallel_4.2.2         crayon_1.5.2           lattice_0.22-6        
+    ## [52] Biostrings_2.66.0      annotate_1.76.0        circlize_0.4.16       
+    ## [55] hms_1.1.3              KEGGREST_1.38.0        magick_2.8.3          
+    ## [58] locfit_1.5-9.9         knitr_1.46             pillar_1.9.0          
+    ## [61] rjson_0.2.21           geneplotter_1.76.0     codetools_0.2-20      
+    ## [64] XML_3.99-0.16.1        glue_1.7.0             evaluate_0.23         
+    ## [67] png_0.1-8              vctrs_0.6.5            tzdb_0.4.0            
+    ## [70] foreach_1.5.2          gtable_0.3.5           clue_0.3-65           
+    ## [73] cachem_1.0.8           xfun_0.43              xtable_1.8-4          
+    ## [76] iterators_1.0.14       AnnotationDbi_1.60.2   memoise_2.0.1         
+    ## [79] cluster_2.1.6          timechange_0.3.0
