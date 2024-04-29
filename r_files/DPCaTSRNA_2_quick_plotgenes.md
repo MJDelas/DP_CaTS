@@ -258,12 +258,13 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","U
 
 ![](DPCaTSRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-10-3.png)<!-- -->
 
-Temporal program
+### plots for Poster
 
 ``` r
-geneOI <- c("Nr6a1","Lef1","Sox9","Rfx4","Nfib","Atf3","Fos")
+geneOI <- c("Nkx2-9","Neurod4","Dll1","Dll3", "Hey1","Neurog1","Neurog2")
 
-ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500")) %>%
          mutate(geneid=factor(geneid, levels=geneOI)), 
        aes(x=Day,y=counts_norm)) +
   stat_summary(aes(fill=Gate),
@@ -273,7 +274,7 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","U
   scale_fill_manual(values=color_gates) +
   scale_color_manual(values=color_gates) +
   scale_shape_manual(values=shapes4_fill_manual) +
-  facet_grid(geneid ~ Condition, scales = "free_y") +
+  facet_wrap(~ geneid , scales = "free_y") +
   theme_bw()
 ```
 
@@ -297,12 +298,10 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","U
 
 ![](DPCaTSRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->
 
-Genes from Rayon et al
+Temporal program
 
 ``` r
-geneOI <- c("Olig2","Olig1","Nkx2-2","Nkx2-9","Nkx6-1","Nkx6-2","Fabp7",
-            "Sox9","Neurod4","Neurog1","Neurog2","Neurog3")
-
+geneOI <- c("Nr6a1","Lef1","Sox9","Rfx4","Nfib","Atf3","Fos")
 
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
          mutate(geneid=factor(geneid, levels=geneOI)), 
@@ -338,13 +337,11 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","U
 
 ![](DPCaTSRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
 
-Rayon’s “gliogenic score”
-
-FABP7, SOX9, SOX10, PDGFRA, CSPG4, FGFR3, FGFBP3, DBI, SLC1A3, HOPX,
-ALDH1L1
+Genes from Rayon et al
 
 ``` r
-geneOI <- c("Fabp7","Sox9","Sox10","Pdgfra","Cspg4","Fgfr3","Fgfbp3","Dbi","Slc1a3","Hopx","Aldh1l1")
+geneOI <- c("Olig2","Olig1","Nkx2-2","Nkx2-9","Nkx6-1","Nkx6-2","Fabp7",
+            "Sox9","Neurod4","Neurog1","Neurog2","Neurog3")
 
 
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
@@ -381,12 +378,13 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","U
 
 ![](DPCaTSRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-13-2.png)<!-- -->
 
-### Wnt genes
+Rayon’s “gliogenic score”
 
-following Agalliu et al
+FABP7, SOX9, SOX10, PDGFRA, CSPG4, FGFR3, FGFBP3, DBI, SLC1A3, HOPX,
+ALDH1L1
 
 ``` r
-geneOI <- c("Wnt4","Wnt5a","Wnt5b","Wnt1","Wnt7a","Wnt7b")
+geneOI <- c("Fabp7","Sox9","Sox10","Pdgfra","Cspg4","Fgfr3","Fgfbp3","Dbi","Slc1a3","Hopx","Aldh1l1")
 
 
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
@@ -423,8 +421,12 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","U
 
 ![](DPCaTSRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-14-2.png)<!-- -->
 
+### Wnt genes
+
+following Agalliu et al
+
 ``` r
-geneOI <- c("Nkx2-9","Sp8","Foxa2","Phox2b")
+geneOI <- c("Wnt4","Wnt5a","Wnt5b","Wnt1","Wnt7a","Wnt7b")
 
 
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
@@ -460,6 +462,44 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","U
 ```
 
 ![](DPCaTSRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-15-2.png)<!-- -->
+
+``` r
+geneOI <- c("Nkx2-9","Sp8","Foxa2","Phox2b")
+
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Day,y=counts_norm)) +
+  stat_summary(aes(fill=Gate),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=color_gates) +
+  scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+```
+
+![](DPCaTSRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->
+
+``` r
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
+         filter(Gate !="neur") %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Day),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
+  geom_point(aes(fill=Day), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  #scale_fill_manual(values=color_gates) +
+  #scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+```
+
+![](DPCaTSRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
 
 ``` r
 sessionInfo()
