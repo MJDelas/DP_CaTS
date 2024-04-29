@@ -216,7 +216,7 @@ geneOI <- c("Dll1","Dll3","Neurod4","Nkx2-9",
 
 
 
-geneOI <- c("Nkx2-9","Nkx6-2","Neurod4","Dll1","Dll3", "Hey1","Neurog1","Neurog2")
+#geneOI <- c("Nkx2-9","Nkx6-2","Neurod4","Dll1","Dll3", "Hey1","Neurog1","Neurog2")
 ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>% 
         mutate(geneid=factor(geneid, levels=geneOI)), 
        aes(x=Gate,y=counts_norm)) +
@@ -260,12 +260,12 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","U
 ```
 
 ### plots for Poster
-```{r fig.height=9, fig.width=9}
+```{r fig.height=4, fig.width=9}
 
-geneOI <- c("Nkx2-9","Neurod4","Dll1","Dll3", "Hey1","Neurog1","Neurog2")
+geneOI <- c("Nkx2-9","Dll1","Hey1","Neurog2","Hes1","Notch1")
 
 
-ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500")) %>%
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500") & Gate!="neurons" ) %>%
          mutate(geneid=factor(geneid, levels=geneOI)), 
        aes(x=Day,y=counts_norm)) +
   stat_summary(aes(fill=Gate),
@@ -278,19 +278,6 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500")) 
   facet_wrap(~ geneid , scales = "free_y") +
   theme_bw()
 
-ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG","dRA2UPSAG")) %>%
-         filter(Gate !="neur") %>%
-         mutate(geneid=factor(geneid, levels=geneOI)), 
-       aes(x=Gate,y=counts_norm)) +
-  stat_summary(aes(fill=Day),
-    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge(0.7)) +
-  geom_point(aes(fill=Day), alpha=0.6, position = position_dodge(width = 0.7),color="black") +
-  #geom_col(position="dodge",aes(fill=DayGate)) +
-  #scale_fill_manual(values=color_gates) +
-  #scale_color_manual(values=color_gates) +
-  scale_shape_manual(values=shapes4_fill_manual) +
-  facet_grid(geneid ~ Condition, scales = "free_y") +
-  theme_bw()
 
 ```
 
