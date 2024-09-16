@@ -670,6 +670,89 @@ ggplot(classified_filtered_celltype_and_FOXA2_prop, aes(x=Foxa2, y=DP)) +
 
 ```
 
+## Attempts at plotting Foxa2 levels
+
+```{r fig.width=14, fig.height=12}
+
+ggplot(segment_cp_geno, aes(x=Location_Center_X,y=-Location_Center_Y)) +
+  #geom_point(size=0.01) +
+  geom_point(size=0.1, aes(color=Intensity_MeanIntensity_FOXA2_Image))+
+  scale_color_gradient2(low = "grey", mid = "white", high = "brown") +
+  facet_wrap( ~ embryoID) +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL) +
+  theme_bw()
+
+ggplot(classified_filtered, aes(x=-Location_Center_Y,y=Intensity_MeanIntensity_FOXA2_Image)) +
+  #geom_point(size=0.01) +
+  geom_point(size=0.1, aes(color=Intensity_MeanIntensity_SOX2_Image))+
+  scale_color_gradient2(low = "grey", mid = "white", high = "brown") +
+  facet_wrap( ~ embryoID) +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL) +
+  theme_bw()
+
+ggplot(classified_filtered, aes(x=-Location_Center_Y,y=Intensity_MeanIntensity_FOXA2_Image)) +
+  #geom_point(size=0.01) +
+  geom_point(size=0.1, aes(color=Intensity_MeanIntensity_NKX22_Image))+
+  scale_color_gradient2(low = "grey", mid = "white", high = "darkgreen") +
+  facet_wrap( ~ embryoID) +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL) +
+  theme_bw()
+
+```
+```{r}
+ggplot(classified_filtered %>% filter(embryoID=="8.1fA_Pos2_A1"), aes(y=-Location_Center_Y,x=Intensity_MeanIntensity_FOXA2_Image)) +
+  #geom_point(size=0.01) +
+  geom_point(size=0.1, aes(color=Intensity_MeanIntensity_NKX22_Image))+
+  scale_color_gradient2(low = "grey", mid = "white", high = "darkgreen") +
+  facet_wrap( ~ embryoID) +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL) +
+  theme_bw()
+
+ggplot(classified_filtered %>% filter(embryoID=="8.1fA_Pos2_A1"), aes(y=-Location_Center_Y,x=Intensity_MeanIntensity_FOXA2_Image)) +
+  #geom_point(size=0.01) +
+  geom_point(size=0.1, aes(color=celltype))+
+  #scale_color_gradient2(low = "grey", mid = "white", high = "grey10") +
+  facet_wrap( ~ embryoID) +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL) +
+  theme_bw()
+
+ggplot(classified_filtered %>% filter(embryoID=="8.1fA_Pos2_A1") %>%
+         filter(Location_Center_X>500), aes(y=-Location_Center_Y,x=Intensity_MeanIntensity_FOXA2_Image)) +
+  #geom_point(size=0.01) +
+  geom_point(size=0.1, aes(color=celltype))+
+  #scale_color_gradient2(low = "grey", mid = "white", high = "grey10") +
+  facet_wrap( ~ embryoID) +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL) +
+  theme_bw()
+
+ggplot(classified_filtered %>% filter(embryoID=="8.1fA_Pos2_A1") %>%
+         filter(Location_Center_X<500), aes(y=-Location_Center_Y,x=Intensity_MeanIntensity_FOXA2_Image)) +
+  #geom_point(size=0.01) +
+  geom_point(size=0.1, aes(color=celltype))+
+  #scale_color_gradient2(low = "grey", mid = "white", high = "grey10") +
+  facet_wrap( ~ embryoID) +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL) +
+  theme_bw()
+
+ggplot(classified_filtered %>% filter(embryoID=="8.1fA_Pos2_A1") %>%
+         filter(Location_Center_X<500), aes(y=-Location_Center_Y,x=Intensity_MeanIntensity_FOXA2_Image)) +
+  #geom_point(size=0.01) +
+  geom_point(size=1, aes(color=Intensity_MeanIntensity_FOXA2_Image))+
+  scale_color_gradient2(low = "white", mid = "grey90", high = "grey20") +
+  facet_wrap( ~ embryoID) +
+  ggtitle("X under 500") +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL) +
+  theme_bw()
+
+ggplot(classified_filtered  %>% filter(embryoID=="8.1fA_Pos2_A1"), aes(x=Location_Center_X,y=-Location_Center_Y)) +
+  #geom_point(size=0.01) +
+  geom_point(size=0.5, aes(color=Intensity_MeanIntensity_FOXA2_Image))+
+  scale_color_gradient2(low = "grey", mid = "white", high = "grey20") +
+  facet_wrap( ~ embryoID) +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL) +
+  theme_bw()
+
+```
 
 
 ```{r}
