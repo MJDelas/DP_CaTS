@@ -752,6 +752,14 @@ ggplot(classified_filtered  %>% filter(embryoID=="8.1fA_Pos2_A1"), aes(x=Locatio
   #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL) +
   theme_bw()
 
+ggplot(classified_filtered  %>% filter(embryoID=="8.1fA_Pos2_A1"), aes(x=Location_Center_X,y=-Location_Center_Y)) +
+  #geom_point(size=0.01) +
+  geom_point(size=0.5, aes(color=Intensity_MeanIntensity_NKX22_Image))+
+  scale_color_gradient2(low = "grey", mid = "white", high = "darkgreen") +
+  facet_wrap( ~ embryoID) +
+  #coord_fixed(ratio = 1, xlim = NULL, ylim = NULL) +
+  theme_bw()
+
 ```
 
 
