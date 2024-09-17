@@ -511,6 +511,43 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","U
 
 ```
 
+## genes for James
+
+```{r fig.width=6, fig.height=6}
+geneOI <- c("Tle1","Tle2","Tle3","Tle4","Tle6")
+
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG")) %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Day,y=counts_norm, fill=Gate)) +
+  stat_summary(aes(fill=Gate),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge2(0.7,preserve = "single")) +
+  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge2(width = 0.7,preserve = "single"),color="black", shape=21) +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=color_gates) +
+  scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free") +
+  theme_bw()
+
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG")) %>%
+         filter(Gate !="neur") %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Day),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge2(0.7,preserve = "single")) +
+  geom_point(aes(fill=Day), alpha=0.6, position = position_dodge2(0.7,preserve = "single"),color="black", shape=21) +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  #scale_fill_manual(values=color_gates) +
+  #scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+
+```
+
+
 
 ```{r}
 sessionInfo()

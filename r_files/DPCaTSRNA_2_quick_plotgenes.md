@@ -512,13 +512,53 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","U
 
 ![](DPCaTSRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-17-2.png)<!-- -->
 
+## genes for James
+
+``` r
+geneOI <- c("Tle1","Tle2","Tle3","Tle4","Tle6")
+
+
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG")) %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Day,y=counts_norm, fill=Gate)) +
+  stat_summary(aes(fill=Gate),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge2(0.7,preserve = "single")) +
+  geom_point(aes(fill=Gate), alpha=0.6, position = position_dodge2(width = 0.7,preserve = "single"),color="black", shape=21) +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  scale_fill_manual(values=color_gates) +
+  scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free") +
+  theme_bw()
+```
+
+![](DPCaTSRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
+``` r
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG")) %>%
+         filter(Gate !="neur") %>%
+         mutate(geneid=factor(geneid, levels=geneOI)), 
+       aes(x=Gate,y=counts_norm)) +
+  stat_summary(aes(fill=Day),
+    fun = mean, geom="bar", alpha=0.9, width=0.7,position=position_dodge2(0.7,preserve = "single")) +
+  geom_point(aes(fill=Day), alpha=0.6, position = position_dodge2(0.7,preserve = "single"),color="black", shape=21) +
+  #geom_col(position="dodge",aes(fill=DayGate)) +
+  #scale_fill_manual(values=color_gates) +
+  #scale_color_manual(values=color_gates) +
+  scale_shape_manual(values=shapes4_fill_manual) +
+  facet_grid(geneid ~ Condition, scales = "free_y") +
+  theme_bw()
+```
+
+![](DPCaTSRNA_2_quick_plotgenes_files/figure-gfm/unnamed-chunk-18-2.png)<!-- -->
+
 ``` r
 sessionInfo()
 ```
 
     ## R version 4.4.0 (2024-04-24)
     ## Platform: aarch64-apple-darwin20
-    ## Running under: macOS Sonoma 14.5
+    ## Running under: macOS Sonoma 14.6.1
     ## 
     ## Matrix products: default
     ## BLAS:   /Library/Frameworks/R.framework/Versions/4.4-arm64/Resources/lib/libRblas.0.dylib 
@@ -535,28 +575,28 @@ sessionInfo()
     ## [8] base     
     ## 
     ## other attached packages:
-    ##  [1] ComplexHeatmap_2.19.0 lubridate_1.9.3       forcats_1.0.0        
+    ##  [1] ComplexHeatmap_2.20.0 lubridate_1.9.3       forcats_1.0.0        
     ##  [4] stringr_1.5.1         dplyr_1.1.4           purrr_1.0.2          
     ##  [7] readr_2.1.5           tidyr_1.3.1           tibble_3.2.1         
     ## [10] ggplot2_3.5.1         tidyverse_2.0.0       RColorBrewer_1.1-3   
     ## 
     ## loaded via a namespace (and not attached):
     ##  [1] utf8_1.2.4          generics_0.1.3      shape_1.4.6.1      
-    ##  [4] stringi_1.8.3       hms_1.1.3           digest_0.6.35      
+    ##  [4] stringi_1.8.4       hms_1.1.3           digest_0.6.35      
     ##  [7] magrittr_2.0.3      evaluate_0.23       timechange_0.3.0   
-    ## [10] iterators_1.0.14    circlize_0.4.16     fastmap_1.1.1      
+    ## [10] iterators_1.0.14    circlize_0.4.16     fastmap_1.2.0      
     ## [13] foreach_1.5.2       doParallel_1.0.17   GlobalOptions_0.1.2
     ## [16] fansi_1.0.6         scales_1.3.0        codetools_0.2-20   
-    ## [19] cli_3.6.2           rlang_1.1.3         crayon_1.5.2       
+    ## [19] cli_3.6.2           rlang_1.1.4         crayon_1.5.2       
     ## [22] munsell_0.5.1       withr_3.0.0         yaml_2.3.8         
     ## [25] tools_4.4.0         parallel_4.4.0      tzdb_0.4.0         
-    ## [28] colorspace_2.1-0    BiocGenerics_0.49.1 GetoptLong_1.0.5   
+    ## [28] colorspace_2.1-0    BiocGenerics_0.50.0 GetoptLong_1.0.5   
     ## [31] vctrs_0.6.5         R6_2.5.1            png_0.1-8          
     ## [34] stats4_4.4.0        matrixStats_1.3.0   lifecycle_1.0.4    
-    ## [37] S4Vectors_0.41.7    IRanges_2.37.1      clue_0.3-65        
+    ## [37] S4Vectors_0.42.0    IRanges_2.38.0      clue_0.3-65        
     ## [40] cluster_2.1.6       pkgconfig_2.0.3     pillar_1.9.0       
-    ## [43] gtable_0.3.5        glue_1.7.0          highr_0.10         
-    ## [46] xfun_0.43           tidyselect_1.2.1    rstudioapi_0.16.0  
-    ## [49] knitr_1.46          farver_2.1.1        rjson_0.2.21       
-    ## [52] htmltools_0.5.8.1   labeling_0.4.3      rmarkdown_2.26     
+    ## [43] gtable_0.3.5        glue_1.7.0          highr_0.11         
+    ## [46] xfun_0.44           tidyselect_1.2.1    rstudioapi_0.16.0  
+    ## [49] knitr_1.47          farver_2.1.2        rjson_0.2.21       
+    ## [52] htmltools_0.5.8.1   labeling_0.4.3      rmarkdown_2.27     
     ## [55] compiler_4.4.0
