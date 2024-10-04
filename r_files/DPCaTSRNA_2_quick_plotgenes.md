@@ -515,10 +515,10 @@ ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","U
 ## genes for James
 
 ``` r
-geneOI <- c("Tle1","Tle2","Tle3","Tle4","Tle6")
+geneOI <- c("Tle1","Tle2","Tle3","Tle4","Tle6","Aes")
 
 
-ggplot(dds_counts_plot %>% filter(geneid %in% geneOI & Condition %in% c("500","UPSAG")) %>%
+ggplot(dds_counts_plot %>% filter(geneid %in% geneOI) %>%
          mutate(geneid=factor(geneid, levels=geneOI)), 
        aes(x=Day,y=counts_norm, fill=Gate)) +
   stat_summary(aes(fill=Gate),
